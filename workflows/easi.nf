@@ -32,6 +32,7 @@ workflow EASI {
     //
     // MODULE: Run FastQC
     //
+    ch_samplesheet.view()
     FASTQC(ch_samplesheet)
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ _meta, file -> file })
 
