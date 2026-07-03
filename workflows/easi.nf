@@ -3,12 +3,18 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_easi_pipeline'
+include { FASTQC as FASTQC_RAW     } from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_TRIMMED } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                  } from '../modules/nf-core/multiqc/main'
+include { TRIMGALORE               } from '../modules/nf-core/trimgalore/main'
+include { STAR_ALIGN               } from '../modules/nf-core/star/align/main'
+include { FEATURECOUNTS_MERGE      } from '../modules/local/featurecounts_merge/main'
+include { SUBREAD_FEATURECOUNTS    } from '../modules/nf-core/subread/featurecounts/main'
+include { paramsSummaryMap         } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc     } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText   } from '../subworkflows/local/utils_nfcore_easi_pipeline'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,11 +36,61 @@ workflow EASI {
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
     //
-    // MODULE: Run FastQC
+    // MODULE: Run FastQC on raw reads
     //
-    ch_samplesheet.view()
-    FASTQC(ch_samplesheet)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ _meta, file -> file })
+    FASTQC_RAW(ch_samplesheet)
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_RAW.out.zip.map { _meta, file -> file })
+
+    //
+    // MODULE: Trim reads
+    //
+    TRIMGALORE(ch_samplesheet)
+    ch_multiqc_files = ch_multiqc_files.mix(TRIMGALORE.out.log.map { _meta, file -> file })
+
+    //
+    // MODULE: Run FastQC on trimmed reads
+    //
+    FASTQC_TRIMMED(TRIMGALORE.out.reads)
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMMED.out.zip.map { _meta, file -> file })
+
+    //
+    // MODULE: Align trimmed reads with STAR
+    //
+    ch_star_index = Channel.value([[:], file(params.star_index, checkIfExists: true)])
+    ch_gtf        = Channel.value([[:], file(params.gtf, checkIfExists: true)])
+
+    STAR_ALIGN(
+        TRIMGALORE.out.reads,
+        ch_star_index,
+        ch_gtf,
+        false
+    )
+
+    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_final.map { _meta, file -> file })
+    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_out.map { _meta, file -> file })
+    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_progress.map { _meta, file -> file })
+
+
+    //
+    // MODULE: Count reads with featureCounts
+    //
+    ch_bam_for_featurecounts = STAR_ALIGN.out.bam_sorted_aligned
+        .combine(ch_gtf)
+        .map { meta, bam, gtf_meta, gtf ->
+        [ meta, [bam], gtf ]
+        }
+
+    SUBREAD_FEATURECOUNTS(ch_bam_for_featurecounts)
+
+    ch_multiqc_files = ch_multiqc_files.mix(SUBREAD_FEATURECOUNTS.out.summary.map { _meta, file -> file })
+
+    //
+    // MODULE: Merge featureCounts outputs
+    //
+    FEATURECOUNTS_MERGE(SUBREAD_FEATURECOUNTS.out.counts
+        .map { meta, file -> file }
+        .collect()
+        )
 
     //
     // Collate and save software versions
@@ -93,6 +149,7 @@ workflow EASI {
     )
     emit:multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
+
 }
 
 /*
