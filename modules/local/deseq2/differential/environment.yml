@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/environment-schema.json
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::bioconductor-deseq2
+  - bioconda::bioconductor-limma
+  - bioconda::bioconductor-apeglm
+  - conda-forge::r-ggplot2
+  - conda-forge::r-ggrepel
+  - bioconda::bioconductor-enhancedvolcano
+  - bioconda::bioconductor-annotationdbi
+  - bioconda::bioconductor-org.hs.eg.db
+  - bioconda::bioconductor-org.mm.eg.db
+  - bioconda::bioconductor-clusterprofiler
+  - conda-forge::r-msigdbr
+  - bioconda::bioconductor-enrichplot
+  - conda-forge::r-rmarkdown
+  - conda-forge::r-knitr
+  

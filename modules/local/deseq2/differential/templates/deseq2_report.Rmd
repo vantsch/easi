@@ -1,0 +1,157 @@
+---
+title: "EASI RNA-seq Analysis Report"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    code_folding: hide
+params:
+  prefix: "UHR_vs_HBR"
+
+---
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+prefix <- params$prefix
+
+read_tsv_if_exists <- function(file) {
+  if (file.exists(file)) {
+    read.delim(file, sep = "\t", header = TRUE, check.names = FALSE)
+  } else {
+    NULL
+  }
+}
+
+show_table <- function(df, n = 20) {
+  if (is.null(df) || nrow(df) == 0) {
+    cat("No results available.")
+  } else {
+    knitr::kable(head(df, n))
+  }
+}
+
+show_image <- function(file) {
+  if (file.exists(file)) {
+    knitr::include_graphics(file)
+  } else {
+    cat("File not available.")
+  }
+}
+```
+# Overview
+
+| Item | Value |
+|------|------|
+| Comparison | UHR vs HBR |
+| Design | ~ condition |
+| Samples | 6 |
+| Genes tested | 20,345 |
+| Significant genes (padj < 0.05) | 1,245 |
+
+---
+
+# Quality control
+
+## PCA
+
+![](UHR_vs_HBR.deseq2.PCA.labelled.png)
+
+Short interpretation:
+- Samples cluster by condition.
+- No obvious outliers.
+
+---
+
+## Dispersion estimates
+
+![](UHR_vs_HBR.deseq2.dispersion.png)
+
+---
+
+# Differential expression
+
+## Volcano plot
+
+![](UHR_vs_HBR.deseq2.volcano.png)
+
+---
+
+## MA plot
+
+```{r ma-plot, echo=FALSE, out.width="80%"}
+show_image(paste(prefix, "deseq2.MA.png", sep = "."))
+```
+
+---
+
+## Top differentially expressed genes
+
+```{r, echo=FALSE}
+knitr::kable(
+  head(read.delim("UHR_vs_HBR.deseq2.results.tsv"),50)
+)
+```
+
+---
+
+# Gene set enrichment
+
+## Hallmark pathways
+
+```{r, echo=FALSE}
+hallmark <- read.delim("UHR_vs_HBR.hallmark_gsea.tsv")
+knitr::kable(head(hallmark,20))
+```
+
+![](UHR_vs_HBR.hallmark_gsea.dotplot.png)
+
+---
+
+## GO Biological Process
+
+![](UHR_vs_HBR.go_BP_ora.dotplot.png)
+
+```{r, echo=FALSE}
+go <- read.delim("UHR_vs_HBR.go_BP_ora.tsv")
+knitr::kable(head(go,20))
+```
+
+---
+
+## GO Molecular Function
+
+![](UHR_vs_HBR.go_MF_ora.dotplot.png)
+
+---
+
+## GO Cellular Component
+
+![](UHR_vs_HBR.go_CC_ora.dotplot.png)
+
+---
+
+# Output files
+
+```{r output-files, echo=FALSE, results='asis'}
+files <- list.files(pattern = paste0("^", prefix, "\\."))
+
+if (length(files) == 0) {
+  cat("No output files found.")
+} else {
+  cat("<ul>")
+  for (f in files) {
+    cat(sprintf(
+      '<li><a href="%s" download>%s</a></li>',
+      f,
+      f
+    ))
+  }
+  cat("</ul>")
+}
+```
+---
+
+# Session information
+
+```{r, echo=FALSE}
+sessionInfo()
+```

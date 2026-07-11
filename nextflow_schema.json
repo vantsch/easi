@@ -81,6 +81,15 @@
                 }
             }
         },
+        "organism": {
+            "type": "string",
+            "default": "human",
+            "description": "Organism for gene annotation.",
+            "enum": [
+                "human",
+                "mouse"
+            ]
+        },  
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",

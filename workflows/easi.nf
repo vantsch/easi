@@ -9,6 +9,7 @@ include { MULTIQC                  } from '../modules/nf-core/multiqc/main'
 include { TRIMGALORE               } from '../modules/nf-core/trimgalore/main'
 include { STAR_ALIGN               } from '../modules/nf-core/star/align/main'
 include { FEATURECOUNTS_MERGE      } from '../modules/local/featurecounts_merge/main'
+include { DESEQ2_DIFFERENTIAL      } from '../modules/local/deseq2/differential/main'
 include { SUBREAD_FEATURECOUNTS    } from '../modules/nf-core/subread/featurecounts/main'
 include { paramsSummaryMap         } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc     } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -87,10 +88,50 @@ workflow EASI {
     //
     // MODULE: Merge featureCounts outputs
     //
-    FEATURECOUNTS_MERGE(SUBREAD_FEATURECOUNTS.out.counts
-        .map { meta, file -> file }
-        .collect()
-        )
+    ch_merge_script = Channel.value(
+        file("${projectDir}/modules/local/featurecounts_merge/bin/merge_featurecounts.py", checkIfExists: true)
+    )
+
+    FEATURECOUNTS_MERGE(
+        SUBREAD_FEATURECOUNTS.out.counts
+            .map { meta, file -> file }
+         .collect(),
+        ch_merge_script
+    )
+
+    //
+    // MODULE: Differential expression with DESeq2
+    //
+    ch_deseq2_contrast = Channel.value([
+        [id: 'UHR_vs_HBR'],
+        'condition',
+        'HBR',
+        'UHR',
+        params.deseq2_formula,
+        params.deseq2_comparison
+    ])
+
+    ch_deseq2_input = FEATURECOUNTS_MERGE.out.matrix
+        .map { counts ->
+            [
+                [id: 'counts'],
+                file(params.input, checkIfExists: true),
+                counts
+            ]
+        }
+
+    ch_empty_file = Channel.value([
+        [id: 'none'],
+        []
+    ])
+
+    DESEQ2_DIFFERENTIAL(
+        ch_deseq2_contrast,
+        ch_deseq2_input,
+        ch_empty_file,
+        ch_empty_file,
+        file("${projectDir}/modules/local/deseq2/differential/templates/deseq2_report.Rmd")
+    )
 
     //
     // Collate and save software versions

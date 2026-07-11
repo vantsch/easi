@@ -5,6 +5,7 @@ process FEATURECOUNTS_MERGE {
 
     input:
     path counts
+    path merge_script
 
     output:
     path "featureCounts.matrix.tsv", emit: matrix
@@ -18,7 +19,7 @@ process FEATURECOUNTS_MERGE {
 
     script:
     """
-    python ${moduleDir}/bin/merge_featurecounts.py \\
+    python ${merge_script} \\
         --counts ${counts.join(' ')} \\
         --out featureCounts.matrix.tsv
     """
