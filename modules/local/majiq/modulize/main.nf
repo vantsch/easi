@@ -7,13 +7,12 @@ process MAJIQ_MODULIZE {
     tuple path(voila_files), val(meta_splicegraph), path(splicegraph)
 
     output:
-    path("modulize"), emit: modulize_files
-    tuple val("${task.process}"),
-          val('voila'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/voila --version'),
-          emit: versions_majiq,
-          topic: versions
-
+    path "modulize", emit: modulize
+    tuple val("${task.process}"), val('voila'),
+        eval('/Users/ucl/micromamba/envs/majiq/bin/voila --version | grep -oE "[0-9]+\\.[0-9]+\\.[0-9]+"'),
+        emit: versions_voila,
+        topic: versions
+    
     when:
     task.ext.when == null || task.ext.when
 
