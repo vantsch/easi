@@ -1,0 +1,14 @@
+name: leafcutter_ds
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - r-base=4.3.3
+  - r-optparse
+  - r-dplyr
+  - r-ggplot2
+  - r-reshape2
+  - bioconductor-dirichletmultinomial
+  - r-r.utils

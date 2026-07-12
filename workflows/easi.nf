@@ -12,10 +12,14 @@ include { SAMTOOLS_INDEX           } from '../modules/nf-core/samtools/index/mai
 include { BEDOPS_GTF2BED           } from '../modules/nf-core/bedops/gtf2bed/main'
 include { AGAT_CONVERTSPGXF2GXF    } from '../modules/nf-core/agat/convertspgxf2gxf/main'
 include { RSEQC_INFEREXPERIMENT    } from '../modules/nf-core/rseqc/inferexperiment/main'
+include { RSEQC_STRANDNESS         } from '../modules/local/rseqc/strandness/main'
 include { FEATURECOUNTS_MERGE      } from '../modules/local/featurecounts_merge/main'
 include { SUBREAD_FEATURECOUNTS    } from '../modules/nf-core/subread/featurecounts/main'
 include { DESEQ2_DIFFERENTIAL      } from '../modules/local/deseq2/differential/main'
 include { MAJIQ                    } from '../subworkflows/local/majiq/main'
+include { REGTOOLS_JUNCTIONSEXTRACT} from '../modules/nf-core/regtools/junctionsextract/main'
+include { LEAFCUTTER_CLUSTER       } from '../modules/local/leafcutter/cluster/main'
+include { LEAFCUTTER_DS            } from '../modules/local/leafcutter/ds/main'
 include { paramsSummaryMap         } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc     } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -130,6 +134,28 @@ workflow EASI {
         ch_bed12
     )
 
+    RSEQC_STRANDNESS(RSEQC_INFEREXPERIMENT.out.txt
+        .map { meta, report -> report }
+        .collect()
+    )
+
+    ch_regtools_strandness = RSEQC_STRANDNESS.out.strandness
+        .map { strandness ->
+            def normalized = strandness.trim()
+
+            def regtools_codes = [
+                'REVERSE'   : 'RF',
+                'FORWARD'   : 'FR',
+                'UNSTRANDED': 'XS'
+            ]
+
+            if (!regtools_codes.containsKey(normalized)) {
+                error "Unsupported inferred strandness: ${normalized}"
+            }
+
+            regtools_codes[normalized]
+        }
+
     ch_multiqc_files = ch_multiqc_files.mix(
         RSEQC_INFEREXPERIMENT.out.txt.map { meta, file -> file }
     )
@@ -208,6 +234,45 @@ workflow EASI {
         ch_gff3,
         STAR_ALIGN.out.bam_sorted_aligned,
         ch_majiq_contrast
+    )
+
+    //
+    // MODULE: Extract splice junctions for LeafCutter
+    //
+    REGTOOLS_JUNCTIONSEXTRACT(
+        ch_bam_bai,
+        ch_regtools_strandness
+    )
+
+    //
+    // MODULE: Cluster splice junctions with LeafCutter
+    //
+    ch_leafcutter_cluster_input = REGTOOLS_JUNCTIONSEXTRACT.out.junc
+        .collect(flat: false)
+        .map { collected ->
+            def junc_files = collected.collect { meta, junc -> junc }
+
+            def groups = collected.collect { meta, junc ->
+                [meta.id, meta.condition]
+            }
+
+            tuple(
+                [id: contrast_name],
+                junc_files,
+                groups
+            )
+        }
+    
+
+    LEAFCUTTER_CLUSTER(
+        ch_leafcutter_cluster_input
+    )
+
+    LEAFCUTTER_DS(LEAFCUTTER_CLUSTER.out.numerators
+        .join(LEAFCUTTER_CLUSTER.out.groups_file)
+        .map { meta, counts, groups ->
+            tuple(meta, counts, groups)
+        }
     )
 
     //
