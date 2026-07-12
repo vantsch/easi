@@ -1,0 +1,32 @@
+name: majiq_modulize
+description: Convert MAJIQ coverage outputs into event modules using Voila
+keywords:
+  - majiq
+  - voila
+  - splicing
+  - modulize
+  - events
+
+tools:
+  - voila:
+      description: Visualization and interpretation toolkit for MAJIQ results
+      homepage: https://majiq.biociphers.org/
+
+input:
+  - voila_files:
+      type: file
+      description: MAJIQ coverage files used for event modulization
+      pattern: "*.{sgc,psicov,dpsicov,hetcov}"
+  - splicegraph:
+      type: directory
+      description: Updated MAJIQ splice graph
+      pattern: "*.zarr"
+
+output:
+  - modulize_files:
+      type: directory
+      description: Directory containing Voila modulize output
+      pattern: "modulize"
+  - versions_majiq:
+      type: value
+      description: Voila version information

@@ -90,6 +90,35 @@
                 "mouse"
             ]
         },  
+        "differential_analysis_options": {
+            "title": "Differential analysis options",
+            "type": "object",
+            "fa_icon": "fas fa-chart-line",
+            "description": "Parameters controlling differential expression and splicing analyses.",
+            "properties": {
+                "contrast_variable": {
+                    "type": "string",
+                    "default": "condition",
+                    "description": "Samplesheet column used to define experimental groups."
+                },
+                "contrast_reference": {
+                    "type": "string",
+                    "description": "Reference (control) condition."
+                },
+                "contrast_target": {
+                    "type": "string",
+                    "description": "Target (treatment) condition."
+                },
+                "contrast_name": {
+                    "type": "string",
+                    "description": "Optional comparison name. Defaults to '<target>_vs_<reference>'."
+                }
+            },
+            "required": [
+                "contrast_reference",
+                "contrast_target"
+            ]
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -247,6 +276,9 @@
         },
         {
             "$ref": "#/$defs/reference_genome_options"
+        },
+        {
+            "$ref": "#/$defs/differential_analysis_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

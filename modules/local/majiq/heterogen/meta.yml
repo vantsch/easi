@@ -1,0 +1,52 @@
+name: majiq_heterogen
+description: Perform replicate-aware heterogeneous differential splicing analysis with MAJIQ
+keywords:
+  - majiq
+  - splicing
+  - heterogeneity
+  - differential splicing
+
+tools:
+  - majiq:
+      description: Modeling Alternative Junction Inclusion Quantification
+      homepage: https://majiq.biociphers.org/
+
+input:
+  - contrast:
+      type: string
+      description: Name of the comparison
+  - treatment:
+      type: string
+      description: Treatment or target condition
+  - control:
+      type: string
+      description: Control or reference condition
+  - treatment_files:
+      type: file
+      description: MAJIQ PSI coverage file for the treatment condition
+      pattern: "*.psicov"
+  - control_files:
+      type: file
+      description: MAJIQ PSI coverage file for the control condition
+      pattern: "*.psicov"
+  - splicegraph:
+      type: directory
+      description: Updated MAJIQ splice graph
+      pattern: "*.zarr"
+
+output:
+  - heterogen_tsv:
+      type: file
+      description: MAJIQ heterogen result table
+      pattern: "*.heterogen.tsv"
+  - hetcov:
+      type: file
+      description: MAJIQ heterogen coverage file for downstream Voila analysis
+      pattern: "*.hetcov"
+  - logger:
+      type: file
+      description: MAJIQ heterogen log file
+      pattern: "*.heterogen.logger.txt"
+  - versions_majiq:
+      type: value
+      description: MAJIQ version information

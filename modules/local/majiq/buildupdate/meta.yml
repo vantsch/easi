@@ -1,0 +1,34 @@
+name: majiq_buildupdate
+description: Update a MAJIQ splice graph using splice-junction files from all samples
+keywords:
+  - majiq
+  - splicing
+  - splice graph
+  - junctions
+
+tools:
+  - majiq:
+      description: Modeling Alternative Junction Inclusion Quantification
+      homepage: https://majiq.biociphers.org/
+
+input:
+  - sj:
+      type: file
+      description: Collection of MAJIQ splice-junction files
+      pattern: "*.sj"
+  - splicegraph:
+      type: directory
+      description: Initial MAJIQ splice graph generated from the annotation
+      pattern: "*.zarr"
+  - list_conditions:
+      type: value
+      description: Mapping between splice-junction filenames and experimental groups
+
+output:
+  - splicegraph:
+      type: directory
+      description: Updated MAJIQ splice graph
+      pattern: "splicegraph.zarr"
+  - versions_majiq:
+      type: value
+      description: MAJIQ version information

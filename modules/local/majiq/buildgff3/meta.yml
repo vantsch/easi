@@ -1,0 +1,51 @@
+name: majiq_buildgff3
+description: Build a MAJIQ reference splice graph from a GFF3 annotation.
+keywords:
+  - splicing
+  - splice graph
+  - gff3
+  - majiq
+tools:
+  - majiq:
+      description: Modeling Alternative Junction Inclusion Quantification
+      homepage: https://majiq.biociphers.org/
+      documentation: https://majiq.biociphers.org/
+      tool_dev_url: https://github.com/biociphers/majiq_academic
+      licence: ["Academic"]
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy map containing annotation metadata.
+          Example: `[ id:'annotation' ]`
+    - gff:
+        type: file
+        description: GFF3-formatted genome annotation.
+        pattern: "*.{gff,gff3}"
+
+output:
+  - splicegraph:
+      - meta:
+          type: map
+          description: Groovy map containing annotation metadata.
+      - "splicegraph.zarr":
+          type: directory
+          description: MAJIQ reference splice graph in Zarr format.
+          pattern: "splicegraph.zarr"
+
+  - versions_majiq:
+      - process:
+          type: string
+          description: Fully qualified Nextflow process name.
+      - tool:
+          type: string
+          description: Tool name.
+      - version:
+          type: string
+          description: Installed MAJIQ version.
+
+authors:
+  - "@VanessaTodorow"
+maintainers:
+  - "@VanessaTodorow"
