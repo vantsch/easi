@@ -1,0 +1,80 @@
+name: pfam_scan
+description: Scan protein sequences against the Pfam profile-HMM database using HMMER hmmscan
+
+keywords:
+  - protein
+  - domains
+  - pfam
+  - hmmer
+  - hmmscan
+
+tools:
+  - hmmer:
+      description: Biosequence analysis using profile hidden Markov models
+      homepage: http://hmmer.org/
+      documentation: http://hmmer.org/documentation.html
+      licence:
+        - BSD-3-Clause
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy map containing sample or contrast information.
+          For example: [ id:'UHR_vs_HBR' ]
+    - aa_fasta:
+        type: file
+        description: Amino-acid FASTA exported by IsoformSwitchAnalyzeR
+        pattern: "*.{fa,fasta,faa,fa.gz,fasta.gz,faa.gz}"
+
+  - - pfam_hmm:
+        type: file
+        description: |
+          Pfam-A profile-HMM database (Pfam-A.hmm).
+
+          Download the current Pfam release, for example:
+
+              curl -O https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+              gunzip Pfam-A.hmm.gz
+
+          Index the database once using:
+
+              hmmpress Pfam-A.hmm
+
+          This generates the required companion files:
+
+              Pfam-A.hmm.h3f
+              Pfam-A.hmm.h3i
+              Pfam-A.hmm.h3m
+              Pfam-A.hmm.h3p
+
+          All five files must be present in the same directory.
+        pattern: "*.hmm"
+
+output:
+  domtblout:
+    - - meta:
+          type: map
+          description: Groovy map containing sample or contrast information
+      - "*.pfam.domtblout":
+          type: file
+          description: Per-domain HMMER results in domtblout format
+
+  tblout:
+    - - meta:
+          type: map
+          description: Groovy map containing sample or contrast information
+      - "*.pfam.tblout":
+          type: file
+          description: Per-sequence HMMER results in tblout format
+
+  versions_hmmer:
+    - versions.yml:
+        type: file
+        description: HMMER version information
+
+authors:
+  - "@VanessaTodorow"
+
+maintainers:
+  - "@VanessaTodorow"

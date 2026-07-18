@@ -20,6 +20,8 @@ include { MAJIQ                    } from '../subworkflows/local/majiq/main'
 include { REGTOOLS_JUNCTIONSEXTRACT} from '../modules/nf-core/regtools/junctionsextract/main'
 include { LEAFCUTTER_CLUSTER       } from '../modules/local/leafcutter/cluster/main'
 include { LEAFCUTTER_DS            } from '../modules/local/leafcutter/ds/main'
+include { LEAFCUTTER_DOWNSTREAM    } from '../modules/local/leafcutter/downstream/main'
+include { ISA                      } from '../subworkflows/local/isa/main'
 include { paramsSummaryMap         } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc     } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -156,6 +158,23 @@ workflow EASI {
             regtools_codes[normalized]
         }
 
+    ch_salmon_lib_type = RSEQC_STRANDNESS.out.strandness
+        .map { strandness ->
+            def normalized = strandness.trim()
+
+            def salmon_codes = [
+                'REVERSE'   : 'ISR',
+                'FORWARD'   : 'ISF',
+                'UNSTRANDED': 'IU'
+            ]
+
+            if (!salmon_codes.containsKey(normalized)) {
+                error "Unsupported inferred strandness for Salmon: ${normalized}"
+            }
+
+            salmon_codes[normalized]
+        }
+
     ch_multiqc_files = ch_multiqc_files.mix(
         RSEQC_INFEREXPERIMENT.out.txt.map { meta, file -> file }
     )
@@ -274,6 +293,59 @@ workflow EASI {
             tuple(meta, counts, groups)
         }
     )
+
+    //
+    // MODULE: Annotate and summarise LeafCutter differential-splicing results
+    //
+    ch_leafcutter_downstream = LEAFCUTTER_DS.out.cluster_significance
+        .join(
+            LEAFCUTTER_DS.out.effect_sizes,
+            by: 0
+        )
+        .join(
+            LEAFCUTTER_CLUSTER.out.numerators,
+            by: 0
+        )
+        .join(
+            LEAFCUTTER_CLUSTER.out.groups_file,
+            by: 0
+        )
+        .combine(ch_gtf)
+        .map {
+            meta,
+            cluster_significance,
+            effect_sizes,
+            counts,
+            groups,
+            gtf_meta,
+            gtf ->
+
+            tuple(
+                meta,
+                cluster_significance,
+                effect_sizes,
+                counts,
+                groups,
+                gtf
+            )
+        }
+
+    LEAFCUTTER_DOWNSTREAM(
+        ch_leafcutter_downstream
+    )
+
+    //
+    // MODULE: ISA
+    //
+    if (params.run_isa.toBoolean()) {
+
+        ISA(
+            TRIMGALORE.out.reads,
+            ch_salmon_lib_type,
+            file(params.input, checkIfExists: true),
+            contrast_name
+        )
+    }
 
     //
     // Collate and save software versions

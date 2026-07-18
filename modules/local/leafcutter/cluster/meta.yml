@@ -1,0 +1,82 @@
+description: Cluster splice junctions into intron excision groups using LeafCutter.
+keywords:
+  - alternative splicing
+  - RNA-seq
+  - splice junctions
+  - leafcutter
+
+tools:
+  - leafcutter:
+      description: Annotation-free detection and quantification of differential RNA splicing.
+      homepage: https://davidaknowles.github.io/leafcutter/
+      documentation: https://davidaknowles.github.io/leafcutter/
+      tool_dev_url: https://github.com/davidaknowles/leafcutter
+      doi: 10.1038/s41588-017-0004-9
+      licence: ["MIT"]
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy map containing comparison metadata.
+          Example: `[ id:'UHR_vs_HBR' ]`
+    - junc_files:
+        type: file
+        description: One or more regtools junction files.
+        pattern: "*.junc"
+    - groups:
+        type: list
+        description: Sample-condition pairs used to generate the LeafCutter groups file.
+
+output:
+  - counts:
+      - meta:
+          type: map
+          description: Groovy map containing comparison metadata.
+      - "*_perind.counts.gz":
+          type: file
+          description: LeafCutter per-sample intron count matrix.
+          pattern: "*_perind.counts.gz"
+
+  - numerators:
+      - meta:
+          type: map
+          description: Groovy map containing comparison metadata.
+      - "*_perind_numers.counts.gz":
+          type: file
+          description: LeafCutter numerator count matrix for differential splicing.
+          pattern: "*_perind_numers.counts.gz"
+
+  - junction_list:
+      - meta:
+          type: map
+          description: Groovy map containing comparison metadata.
+      - "juncfiles.txt":
+          type: file
+          description: List of junction files used for clustering.
+          pattern: "juncfiles.txt"
+
+  - groups_file:
+      - meta:
+          type: map
+          description: Groovy map containing comparison metadata.
+      - "groups_file.txt":
+          type: file
+          description: Two-column sample group file for downstream differential splicing.
+          pattern: "groups_file.txt"
+
+  - versions_leafcutter:
+      - process:
+          type: string
+          description: Fully qualified Nextflow process name.
+      - tool:
+          type: string
+          description: Tool name.
+      - version:
+          type: string
+          description: LeafCutter commit recorded by the container.
+
+authors:
+  - "@VanessaTodorow"
+maintainers:
+  - "@VanessaTodorow"

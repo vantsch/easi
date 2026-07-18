@@ -1,0 +1,8 @@
+name: pfam_scan
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bioconda::hmmer=3.4

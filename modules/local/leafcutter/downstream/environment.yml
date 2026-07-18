@@ -1,0 +1,23 @@
+name: leafcutter_downstream
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - r-base
+  - r-data.table
+  - r-dplyr
+  - r-tidyr
+  - r-ggplot2
+  - r-ggrepel
+  - bioconductor-genomicranges
+  - bioconductor-iranges
+  - bioconductor-s4vectors
+  - bioconductor-annotationdbi
+  - bioconductor-org.hs.eg.db
+  - bioconductor-org.mm.eg.db
+  - bioconductor-clusterprofiler
+  - bioconductor-msigdbr
+  - bioconductor-enrichplot
+  - bioconductor-go.db

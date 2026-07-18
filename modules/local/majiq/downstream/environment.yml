@@ -1,0 +1,8 @@
+name: report_events
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.10
+  - pandas
+  - openpyxl

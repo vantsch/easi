@@ -15,6 +15,7 @@ include { MAJIQ_SGCOVERAGE                        } from '../../../modules/local
 include { MAJIQ_MODULIZE as QUANTIFY_MODULIZE     } from '../../../modules/local/majiq/modulize/main'
 include { MAJIQ_MODULIZE as DELTAPSI_MODULIZE     } from '../../../modules/local/majiq/modulize/main'
 include { MAJIQ_MODULIZE as HETEROGEN_MODULIZE    } from '../../../modules/local/majiq/modulize/main'
+include { MAJIQ_SUMMARIZE                         } from '../../../modules/local/majiq/downstream/main'
 
 
 /*
@@ -204,6 +205,13 @@ workflow MAJIQ {
         ch_majiq_modulize_input_heterogen
     )
 
+    /*
+     * Summaize MAJIQ results into a single Excel workbook
+     */
+    MAJIQ_SUMMARIZE(DELTAPSI_MODULIZE.out.tsv_files,
+        file("${projectDir}/modules/local/majiq/downstream/bin/report_events.py")
+    )
+
     emit:
     splicegraph          = ch_majiq_finished_splicegraph
     sj                   = MAJIQ_BUILDSJ.out.sj
@@ -214,4 +222,5 @@ workflow MAJIQ {
     quantify_modulized   = QUANTIFY_MODULIZE.out.modulize
     deltapsi_modulized   = DELTAPSI_MODULIZE.out.modulize
     heterogen_modulized  = HETEROGEN_MODULIZE.out.modulize
+    deltapsi_report      = MAJIQ_SUMMARIZE.out.workbook
 }

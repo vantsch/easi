@@ -1,0 +1,253 @@
+A single object matching 'createSwitchAnalyzeRlist' was found
+It was found in the following places
+  namespace:IsoformSwitchAnalyzeR
+with value
+
+function (isoformFeatures, exons, designMatrix, isoformCountMatrix = NULL, 
+    isoformRepExpression = NULL, sourceId, removeFusionTranscripts = TRUE) 
+{
+    if (TRUE) {
+        if (TRUE) {
+            if (!is.data.frame(isoformFeatures)) {
+                stop("The isoform_feature argument must be a data.frame")
+            }
+            if (class(exons) != "GRanges") {
+                stop("The exons argument must be a GenomicRanges (GRanges)")
+            }
+            if (class(sourceId) != "character") {
+                stop("The sourceId argument must be a character")
+            }
+            neededCols <- c("isoform_id", "gene_id", "condition_1", 
+                "condition_2", "gene_name", "gene_overall_mean", 
+                "gene_value_1", "gene_value_2", "gene_stderr_1", 
+                "gene_stderr_2", "gene_log2_fold_change", "gene_q_value", 
+                "iso_overall_mean", "iso_value_1", "iso_value_2", 
+                "iso_stderr_1", "iso_stderr_2", "iso_log2_fold_change", 
+                "iso_q_value", "IF_overall", "IF1", "IF2", "dIF", 
+                "isoform_switch_q_value", "gene_switch_q_value")
+            if (!all(neededCols %in% colnames(isoformFeatures))) {
+                tmp <- setdiff(neededCols, colnames(isoformFeatures))
+                stop(paste("The 'isoformFeatures' argument does not", 
+                  "contain the needed information.", "The following are missing", 
+                  paste(tmp, collapse = ", "), sep = " "))
+            }
+            if (any(isoformFeatures$condition_1 == isoformFeatures$condition_2)) {
+                stop(paste("The input data is inadequate - conditions compared", 
+                  "must have unique names (e.g. you cannot compare two", 
+                  "knock out (KO) conditions both called KO", 
+                  "- they must be renamed to fx. KO1 and KO2"))
+            }
+            if (!all(c("isoform_id", "gene_id") %in% colnames(exons@elementMetadata))) {
+                stop(paste("The 'exons' argument must contain both 'isoform_id'", 
+                  "and 'gene_id' as metadata collumns"))
+            }
+            if (length(sourceId) != 1) {
+                stop("sourceId must have length 1")
+            }
+            idSplit <- split(as.character(exons@seqnames), f = exons$gene_id)
+            idSplit <- lapply(idSplit, unique)
+            idLength <- sapply(idSplit, length)
+            if (any(idLength == 1)) {
+                genesToRemove <- names(idLength)[which(idLength > 
+                  1)]
+            }
+            else {
+                stop(paste("The gene_ids must be uniqe - we identified multiple", 
+                  "instances of the same gene_id on different chromosomes.", 
+                  "This typically occures because the annotation have", 
+                  "multiple version of the same region.", "If annotated transcipts were imported please consider", 
+                  "use the 'removeNonConvensionalChr' paramter."))
+            }
+            idSplit2 <- split(as.character(exons@seqnames), f = exons$isoform_id)
+            idSplit2 <- lapply(idSplit2, unique)
+            idSplit2 <- sapply(idSplit2, length)
+            if (any(idLength == 1)) {
+                isoformsToRemove <- names(idLength)[which(idLength > 
+                  1)]
+            }
+            else {
+                stop(paste("The isoform_ids must be uniqe - we identified multiple", 
+                  "instances of the same isoform_id on different chromosomes.", 
+                  "This typically occures because the annotation have", 
+                  "multiple version of the same region.", "If annotated transcipts were imported please consider", 
+                  "use the 'removeNonConvensionalChr' paramter."))
+            }
+            if (TRUE) {
+                countsSuppled <- !is.null(isoformCountMatrix)
+                abundSuppled <- !is.null(isoformRepExpression)
+                if (!countsSuppled) {
+                  warning("Note that when no count matrix was given as input no statistical identification of isoform switches can be done")
+                }
+                if (countsSuppled) {
+                  if (!any(colnames(isoformCountMatrix) == "isoform_id")) {
+                    stop(paste("The data.frame passed to the 'isoformCountMatrix'", 
+                      "argument must contain a 'isoform_id' column"))
+                  }
+                }
+                if (abundSuppled) {
+                  if (!any(colnames(isoformRepExpression) == 
+                    "isoform_id")) {
+                    stop(paste("The data.frame passed to the 'isoformCountMatrix'", 
+                      "argument must contain a 'isoform_id' column"))
+                  }
+                }
+            }
+        }
+        if (TRUE) {
+            if (jaccardSimilarity(isoformFeatures$isoform_id, 
+                exons$isoform_id) != 1) {
+                stop(paste("The isoform_id in isoformFeatures", 
+                  "and exons does not match"))
+            }
+            if (jaccardSimilarity(c(isoformFeatures$condition_1, 
+                isoformFeatures$condition_2), designMatrix$condition) != 
+                1) {
+                stop(paste("The conditions isoformFeatures in and", 
+                  "designMatrix does not match"))
+            }
+            if (countsSuppled) {
+                if (!all(designMatrix$sampleID %in% colnames(isoformCountMatrix))) {
+                  stop(paste("Each sample stored in 'designMatrix$sampleID' must have", 
+                    "a corresponding expression column in 'isoformCountMatrix'"))
+                }
+            }
+            if (abundSuppled) {
+                if (!all(designMatrix$sampleID %in% colnames(isoformRepExpression))) {
+                  stop(paste("Each sample stored in 'designMatrix$sampleID' must", 
+                    "have a corresponding expression column", 
+                    "in 'isoformRepExpression'"))
+                }
+            }
+            if (abundSuppled & countsSuppled) {
+                if (!identical(colnames(isoformCountMatrix), 
+                  colnames(isoformRepExpression))) {
+                  stop("The column name and order of 'isoformCountMatrix' and 'isoformRepExpression' must be identical")
+                }
+                if (!identical(isoformCountMatrix$isoform_id, 
+                  isoformCountMatrix$isoform_id)) {
+                  stop("The ids and order of the 'isoform_id' column in 'isoformCountMatrix' and 'isoformRepExpression' must be identical")
+                }
+            }
+        }
+        if (TRUE) {
+            if (countsSuppled) {
+                j1 <- jaccardSimilarity(isoformCountMatrix$isoform_id, 
+                  isoformFeatures$isoform_id)
+            }
+            else {
+                j1 <- jaccardSimilarity(isoformRepExpression$isoform_id, 
+                  isoformFeatures$isoform_id)
+            }
+            jcCutoff <- 0.95
+            if (j1 != 1) {
+                if (j1 < jcCutoff) {
+                  stop(paste("The annotation (count matrix and isoform annotation)", 
+                    "seems to be different (jacard similarity < 0.95).", 
+                    "Either isforoms found in the annotation are", 
+                    "not quantifed or vise versa.", sep = " "))
+                }
+                if (j1 >= jcCutoff) {
+                  warning(paste("The annotation (count matrix and isoform annotation)", 
+                    "contain differences in which isoforms are analyzed.", 
+                    "specifically the annotation provided contain:", 
+                    length(unique(isoformAnnotation$isoform_id)) - 
+                      length(unique(isoformCountMatrix$isoform_id)), 
+                    "more isoforms than the count matrix.", "Please make sure this is on purpouse since differences", 
+                    "will cause inaccurate quantification and thereby skew all analysis.", 
+                    "NB! All differences were removed from the final switchAnalyzeRlist!", 
+                    sep = " "))
+                  if (countsSuppled) {
+                    isoformsUsed <- intersect(isoformCountMatrix$isoform_id, 
+                      isoformAnnotation$isoform_id)
+                  }
+                  else {
+                    isoformsUsed <- intersect(isoformRepExpression$isoform_id, 
+                      isoformAnnotation$isoform_id)
+                  }
+                  isoformExonStructure <- isoformExonStructure[which(isoformExonStructure$isoform_id %in% 
+                    isoformsUsed), ]
+                  isoformAnnotation <- isoformAnnotation[which(isoformAnnotation$isoform_id %in% 
+                    isoformsUsed), ]
+                  if (countsSuppled) {
+                    isoformCountMatrix <- isoformCountMatrix[which(isoformCountMatrix$isoform_id %in% 
+                      isoformsUsed), ]
+                  }
+                  if (abundSuppled) {
+                    isoformRepExpression <- isoformRepExpression[which(isoformRepExpression$isoform_id %in% 
+                      isoformsUsed), ]
+                  }
+                }
+            }
+        }
+    }
+    if (TRUE) {
+        isoformFeatures <- isoformFeatures[order(isoformFeatures$condition_1, 
+            isoformFeatures$condition_2, isoformFeatures$gene_id, 
+            isoformFeatures$isoform_id), ]
+        tmp <- stringr::str_c(isoformFeatures$gene_id, isoformFeatures$condition_1, 
+            isoformFeatures$condition_2)
+        isoformFeatures$gene_ref <- stringr::str_c("geneComp", 
+            "_", addZeroes(as.integer(factor(tmp, levels = unique(tmp)))))
+        isoformFeatures$iso_ref <- stringr::str_c("isoComp", 
+            "_", addZeroes(1:nrow(isoformFeatures)))
+        isoformFeatures <- isoformFeatures[, c(which(colnames(isoformFeatures) == 
+            "iso_ref"), which(colnames(isoformFeatures) == "gene_ref"), 
+            which(!colnames(isoformFeatures) %in% c("iso_ref", 
+                "gene_ref")))]
+    }
+    if (TRUE) {
+        tmp <- designMatrix
+        for (i in 2:ncol(designMatrix)) {
+            if (class(designMatrix[, i]) %in% c("character", 
+                "factor")) {
+                designMatrix[, i] <- makeProperNames(designMatrix[, 
+                  i])
+            }
+        }
+        if (!identical(tmp, designMatrix)) {
+            message("Please note that some condition names were changed due to names not suited for modeling in R.")
+            isoformFeatures$condition_1 <- makeProperNames(isoformFeatures$condition_1)
+            isoformFeatures$condition_2 <- makeProperNames(isoformFeatures$condition_2)
+        }
+    }
+    if (TRUE) {
+        isFullRank <- testFullRank(designMatrix)
+        if (!isFullRank) {
+            stop(paste("The supplied design matrix will result in a model matrix that is not full rank", 
+                "\nPlease make sure there are no co-linearities in the design"))
+        }
+    }
+    nrRep <- table(designMatrix$condition)
+    nrRep <- data.frame(condition = names(nrRep), nrReplicates = as.vector(nrRep), 
+        row.names = NULL, stringsAsFactors = FALSE)
+    localSwitchList <- new("switchAnalyzeRlist", list(isoformFeatures = isoformFeatures, 
+        exons = exons, conditions = nrRep, designMatrix = designMatrix, 
+        sourceId = sourceId))
+    if (countsSuppled) {
+        localSwitchList$isoformCountMatrix <- isoformCountMatrix[, 
+            c("isoform_id", designMatrix$sampleID)]
+    }
+    if (abundSuppled) {
+        localSwitchList$isoformRepExpression <- isoformRepExpression[, 
+            c("isoform_id", designMatrix$sampleID)]
+    }
+    localSwitchList$runInfo <- list(IsoformSwitchAnalyzeR = list(version = Biobase::package.version("IsoformSwitchAnalyzeR")))
+    if (length(isoformsToRemove)) {
+        additionalGenesToRemove <- localSwitchList$isoformFeatures$gene_id[which(localSwitchList$isoformFeatures$isoform_id %in% 
+            isoformsToRemove)]
+        genesToRemove <- unique(c(genesToRemove, additionalGenesToRemove))
+    }
+    if (length(genesToRemove) & removeFusionTranscripts) {
+        localSwitchList <- subsetSwitchAnalyzeRlist(localSwitchList, 
+            !localSwitchList$isoformFeatures$gene_id %in% genesToRemove)
+        warning(paste("The gene_ids or isoform_ids were not unique - we identified multiple instances", 
+            "of the same gene_id/isoform_id on different chromosomes.", 
+            "To solve this we removed", length(genesToRemove), 
+            "gene_id.", "Please note there might still be duplicated gene_id located", 
+            "on the same chromosome.", "Some of these could be due to fusion transcripts", 
+            "which IsoformSwitchAnalyzeR cannot handle."))
+    }
+    return(localSwitchList)
+}
+<bytecode: 0x555588339478>
+<environment: namespace:IsoformSwitchAnalyzeR>

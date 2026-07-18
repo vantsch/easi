@@ -1,0 +1,9 @@
+name: pfam_format_isa
+
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - conda-forge::python=3.12

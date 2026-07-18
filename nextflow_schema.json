@@ -65,6 +65,16 @@
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
                 },
+                "transcript_fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "description": "Path to transcriptome FASTA file.",
+                    "help_text": "Transcript FASTA used for Salmon indexing and IsoformSwitchAnalyzeR. Transcript identifiers should match the transcript IDs in the supplied GTF.",
+                    "fa_icon": "far fa-file-code"
+            },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
@@ -80,6 +90,45 @@
                     "default": "s3://ngi-igenomes/igenomes/"
                 }
             }
+        },
+        "isoformswitchanalyzer_options": {
+            "title": "IsoformSwitchAnalyzeR",
+            "type": "object",
+            "fa_icon": "fas fa-project-diagram",
+            "description": "Options controlling transcript-level isoform switch analysis.",
+            "properties": {
+                "run_isa": {
+                    "type": "string",
+                    "default": "false",
+                    "enum": ["true", "false"],
+                    "description": "Run IsoformSwitchAnalyzeR including Salmon quantification."
+                },
+                "isa_gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Optional ISA-specific GTF annotation. Useful for excluding spike-in transcripts such as ERCC controls."
+                }, 
+                "pfam_hmm": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the Pfam-A.hmm database."
+                },     
+                "isa_alpha": {
+                    "type": "number",
+                    "default": 0.05,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Adjusted p-value cutoff for isoform-switch analysis."
+                },
+                "isa_dif_cutoff": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Minimum absolute change in isoform fraction."
+                }
+            } 
         },
         "organism": {
             "type": "string",
@@ -285,6 +334,9 @@
         },
         {
             "$ref": "#/$defs/generic_options"
+        },
+        {
+        "$ref": "#/$defs/isoformswitchanalyzer_options"
         }
     ]
 }

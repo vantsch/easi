@@ -1,0 +1,9 @@
+name: isa_part1
+
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - bioconda::bioconductor-isoformswitchanalyzer=2.2.0
