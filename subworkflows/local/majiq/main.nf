@@ -205,12 +205,37 @@ workflow MAJIQ {
         ch_majiq_modulize_input_heterogen
     )
 
-    /*
-     * Summaize MAJIQ results into a single Excel workbook
+     /*
+     * Convert MAJIQ contrast metadata to the standard integration key
      */
-    MAJIQ_SUMMARIZE(DELTAPSI_MODULIZE.out.tsv_files,
+    ch_majiq_summary_meta = ch_contrast
+        .map { contrast ->
+            [id: contrast.contrast]
+        }
+
+    /*
+     * Attach the contrast key to the collection of MAJIQ TSV files.
+     *
+     * combine() produces:
+     * [meta, file1, file2, file3, ...]
+     *
+     * Reconstruct:
+     * [meta, [file1, file2, file3, ...]]
+     */
+    ch_majiq_summarize_input = ch_majiq_summary_meta
+        .combine(DELTAPSI_MODULIZE.out.tsv_files)
+        .map { combined ->
+            def meta      = combined[0]
+            def tsv_files = combined.drop(1)
+
+            tuple(meta, tsv_files)
+        }
+
+    MAJIQ_SUMMARIZE(
+        ch_majiq_summarize_input,
         file("${projectDir}/modules/local/majiq/downstream/bin/report_events.py")
     )
+
 
     emit:
     splicegraph          = ch_majiq_finished_splicegraph
@@ -223,4 +248,5 @@ workflow MAJIQ {
     deltapsi_modulized   = DELTAPSI_MODULIZE.out.modulize
     heterogen_modulized  = HETEROGEN_MODULIZE.out.modulize
     deltapsi_report      = MAJIQ_SUMMARIZE.out.workbook
+    gene_summary         = MAJIQ_SUMMARIZE.out.gene_summary
 }

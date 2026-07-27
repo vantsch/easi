@@ -26,6 +26,7 @@ process LEAFCUTTER_DOWNSTREAM {
     tuple val(meta), path("*.leafcutter.*_ora.*plot.pdf"), emit: enrichment_plots_pdf, optional: true
     tuple val(meta), path("*.leafcutter.*_ora.*plot.png"), emit: enrichment_plots_png, optional: true
     tuple val(meta), path("*.leafcutter.summary.tsv"), emit: summary
+    tuple val(meta), path("*.leafcutter.gene_summary.tsv"), emit: gene_summary
     tuple val(meta), path("*.leafcutter.R_sessionInfo.log"), emit: session_info
     
     when:
@@ -57,6 +58,7 @@ process LEAFCUTTER_DOWNSTREAM {
     touch ${prefix}.leafcutter.counts.annotated.tsv
     touch ${prefix}.leafcutter.sample_groups.tsv
     touch ${prefix}.leafcutter.summary.tsv
+    touch ${prefix}.leafcutter.gene_summary.tsv
     touch ${prefix}.leafcutter.R_sessionInfo.log
     touch ${prefix}.leafcutter.enrichment_gene_sets.tsv
     touch ${prefix}.leafcutter.significant.hallmark_ora.tsv

@@ -26,6 +26,7 @@ process MAJIQ_DELTAPSI {
     task.ext.when == null || task.ext.when
 
     script:
+    def changing_threshold = task.ext.changing_threshold ?: 0.1
     def args = task.ext.args ?: ''
 
     """
@@ -41,6 +42,7 @@ process MAJIQ_DELTAPSI {
         -psi1 ${control_files} \\
         -psi2 ${treatment_files} \\
         --names ${control} ${treatment} \\
+        --changing-threshold ${changing_threshold} \\
         --output-tsv deltapsi/${contrast}.deltapsi.tsv \\
         --logger deltapsi/${contrast}.deltapsi.logger.txt \\
         --output-voila deltapsi/${contrast}.dpsicov \\

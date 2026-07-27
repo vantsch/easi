@@ -4,12 +4,12 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SALMON_INDEX          }    from '../../../modules/nf-core/salmon/index/main'
-include { SALMON_QUANT          }    from '../../../modules/nf-core/salmon/quant/main'
-include { ISA_PART1             }    from '../../../modules/local/isa/part1/main'
-include { PFAM_SCAN             }    from '../../../modules/local/pfam/scan/main'
-include { PFAM_FORMAT_ISA       }    from '../../../modules/local/pfam/format_isa/main'
-include { ISA_PART2             }    from '../../../modules/local/isa/part2/main'
+include { SALMON_INDEX          } from '../../../modules/nf-core/salmon/index/main'
+include { SALMON_QUANT          } from '../../../modules/nf-core/salmon/quant/main'
+include { ISA_PART1             } from '../../../modules/local/isa/part1/main'
+include { PFAM_SCAN             } from '../../../modules/local/pfam/scan/main'
+include { PFAM_FORMAT_ISA       } from '../../../modules/local/pfam/format_isa/main'
+include { ISA_PART2             } from '../../../modules/local/isa/part2/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,7 +135,8 @@ workflow ISA {
         )
 
     ISA_PART2(
-        ch_isa_part2_input
+        ch_isa_part2_input,
+        ch_isa_gtf
     )
 
     emit:
@@ -156,4 +157,5 @@ workflow ISA {
     isa_part2_isoform_features = ISA_PART2.out.isoform_features
     switch_plots               = ISA_PART2.out.switch_plots
     consequence_summary        = ISA_PART2.out.consequence_summary
+    gene_summary           = ISA_PART2.out.gene_summary
 }

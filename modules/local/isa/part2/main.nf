@@ -10,6 +10,7 @@ process ISA_PART2 {
 
     input:
     tuple val(meta), path(switchlist), path(pfam_isa)
+    path gtf
 
     output:
     tuple val(meta), path("switchlist_part2.rds"),
@@ -27,6 +28,9 @@ process ISA_PART2 {
     tuple val(meta), path("common_switch_consequences.pdf"),
         emit: consequence_summary
 
+    tuple val(meta), path("isa_part2.gene_summary.tsv"),
+        emit: gene_summary
+
     when:
     task.ext.when == null || task.ext.when
 
@@ -37,6 +41,7 @@ process ISA_PART2 {
     isa_part2.R \
         ${switchlist} \
         ${pfam_isa} \
+        ${gtf} \
         ${args}
     """
 
@@ -45,6 +50,7 @@ process ISA_PART2 {
     touch switchlist_part2.rds
     touch isa_part2_domain_analysis.tsv
     touch isa_part2_isoform_features.tsv
+    touch isa_part2.gene_summary.tsv
 
     mkdir -p switch_plots
     touch switch_plots/switchplot_stub.pdf

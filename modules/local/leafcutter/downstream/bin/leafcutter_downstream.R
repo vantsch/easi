@@ -1335,6 +1335,256 @@ effect_results_annotated[["significant_intron"]] <-
     effect_results_annotated[["cluster_significant"]] %in% TRUE &
     effect_results_annotated[["passes_effect_threshold"]] %in% TRUE
 
+
+############################################################
+## Standardised gene-level summary                         ##
+############################################################
+
+message("Generating standardised LeafCutter gene-level summary.")
+
+
+# Generate a reliable gene-ID-to-name lookup directly from the GTF.
+gene_name_lookup <- genes[
+    !is.na(genes[["gene_id"]]) &
+        genes[["gene_id"]] != "",
+    c(
+        "gene_id",
+        "gene_name"
+    ),
+    drop = FALSE
+]
+
+gene_name_lookup <- gene_name_lookup[
+    !duplicated(gene_name_lookup[["gene_id"]]),
+    ,
+    drop = FALSE
+]
+
+
+# Expand semicolon-separated gene annotations so that each
+# gene-cluster association occupies one row.
+expanded_gene_cluster_rows <- lapply(
+    seq_len(nrow(effect_results_annotated)),
+    function(row_index) {
+
+        gene_ids <- split_gene_values(
+            effect_results_annotated[["gene_id"]][row_index]
+        )
+
+        if (length(gene_ids) == 0) {
+            return(NULL)
+        }
+
+        data.frame(
+            gene_id = gene_ids,
+            cluster = rep(
+                effect_results_annotated[["cluster"]][row_index],
+                length(gene_ids)
+            ),
+            deltapsi = rep(
+                suppressWarnings(
+                    as.numeric(
+                        effect_results_annotated[["deltapsi"]][row_index]
+                    )
+                ),
+                length(gene_ids)
+            ),
+            cluster_tested = rep(
+                effect_results_annotated[["cluster_tested"]][row_index]
+                    %in% TRUE,
+                length(gene_ids)
+            ),
+            significant_intron = rep(
+                effect_results_annotated[["significant_intron"]][row_index]
+                    %in% TRUE,
+                length(gene_ids)
+            ),
+            stringsAsFactors = FALSE
+        )
+    }
+)
+
+
+expanded_gene_cluster_rows <- Filter(
+    Negate(is.null),
+    expanded_gene_cluster_rows
+)
+
+
+if (length(expanded_gene_cluster_rows) > 0) {
+
+    gene_cluster_introns <- do.call(
+        rbind,
+        expanded_gene_cluster_rows
+    )
+
+    gene_cluster_introns <- merge(
+        gene_cluster_introns,
+        gene_name_lookup,
+        by = "gene_id",
+        all.x = TRUE,
+        sort = FALSE
+    )
+
+
+    # Reduce each gene-cluster association to one event.
+    #
+    # The representative signed effect is the intron ΔPSI with
+    # the largest absolute magnitude in that cluster.
+    gene_cluster_events <- gene_cluster_introns |>
+        dplyr::group_by(
+            gene_id,
+            gene_name,
+            cluster
+        ) |>
+        dplyr::summarise(
+            detected = any(
+                cluster_tested %in% TRUE
+            ),
+            significant = any(
+                significant_intron %in% TRUE
+            ),
+            representative_effect = if (
+                length(deltapsi) == 0 ||
+                all(is.na(deltapsi))
+            ) {
+                NA_real_
+            } else {
+                deltapsi[
+                    which.max(abs(deltapsi))
+                ]
+            },
+            .groups = "drop"
+        ) |>
+        as.data.frame()
+
+
+    gene_summary <- gene_cluster_events |>
+        dplyr::group_by(
+            gene_id,
+            gene_name
+        ) |>
+        dplyr::summarise(
+            method = "LeafCutter",
+            detected = any(
+                detected %in% TRUE
+            ),
+            significant = any(
+                significant %in% TRUE
+            ),
+            n_events = dplyr::n_distinct(
+                cluster[
+                    detected %in% TRUE
+                ]
+            ),
+            n_significant_events = dplyr::n_distinct(
+                cluster[
+                    significant %in% TRUE
+                ]
+            ),
+            max_abs_effect = if (
+                all(is.na(representative_effect))
+            ) {
+                NA_real_
+            } else {
+                max(
+                    abs(representative_effect),
+                    na.rm = TRUE
+                )
+            },
+            effect_direction = {
+
+                direction_effects <- representative_effect[
+                    significant %in% TRUE &
+                        !is.na(representative_effect)
+                ]
+
+                # For non-significant genes, retain the direction
+                # of detected events rather than returning none.
+                if (length(direction_effects) == 0) {
+                    direction_effects <- representative_effect[
+                        detected %in% TRUE &
+                            !is.na(representative_effect)
+                    ]
+                }
+
+                has_positive <- any(
+                    direction_effects > 0
+                )
+
+                has_negative <- any(
+                    direction_effects < 0
+                )
+
+                if (has_positive && has_negative) {
+                    "mixed"
+                } else if (has_positive) {
+                    "increased"
+                } else if (has_negative) {
+                    "decreased"
+                } else {
+                    "none"
+                }
+            },
+            event_types = "intron_cluster",
+            .groups = "drop"
+        ) |>
+        as.data.frame()
+
+
+    gene_summary <- gene_summary[
+        order(
+            -as.integer(gene_summary[["significant"]]),
+            -gene_summary[["n_significant_events"]],
+            -gene_summary[["max_abs_effect"]],
+            gene_summary[["gene_name"]],
+            gene_summary[["gene_id"]],
+            na.last = TRUE
+        ),
+        ,
+        drop = FALSE
+    ]
+
+
+    gene_summary <- gene_summary[
+        ,
+        c(
+            "gene_id",
+            "gene_name",
+            "method",
+            "detected",
+            "significant",
+            "n_events",
+            "n_significant_events",
+            "max_abs_effect",
+            "effect_direction",
+            "event_types"
+        ),
+        drop = FALSE
+    ]
+
+} else {
+
+    warning(
+        "No annotated LeafCutter gene-cluster associations ",
+        "were available for the gene-level summary."
+    )
+
+    gene_summary <- data.frame(
+        gene_id = character(0),
+        gene_name = character(0),
+        method = character(0),
+        detected = logical(0),
+        significant = logical(0),
+        n_events = integer(0),
+        n_significant_events = integer(0),
+        max_abs_effect = numeric(0),
+        effect_direction = character(0),
+        event_types = character(0),
+        stringsAsFactors = FALSE
+    )
+}
+
 ############################################################
 ## Summary table                                            ##
 ############################################################
@@ -1894,6 +2144,14 @@ kegg_effect_filtered <- run_kegg_ora(
 ############################################################
 
 prefix <- opt[["output_prefix"]]
+
+write_tsv(
+    gene_summary,
+    paste0(
+        prefix,
+        ".leafcutter.gene_summary.tsv"
+    )
+)
 
 write_tsv(
     cluster_results_annotated,

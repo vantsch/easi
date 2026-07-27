@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bioconda::rmats=4.3.0
+  - bioconda::r-pairadise=1.0.0

@@ -1,0 +1,21 @@
+thresholds:
+  deseq2:
+    padj: 0.05
+    abs_log2fc: 0.0
+
+ranking:
+  method_weights:
+    deseq2: 1.0
+    majiq: 1.0
+    rmats: 1.0
+    leafcutter: 1.0
+    isa: 1.0
+
+  category_weights:
+    expression: 1.0
+    splicing: 1.0
+
+  agreement_bonus:
+    enabled: true
+    per_additional_method: 0.20
+    maximum: 0.60

@@ -44,7 +44,6 @@ SHEET_NAMES = {
     "tandem_cassette": "Tandem Exon Skipping",
 }
 
-
 SUMMARY_COLUMNS = [
     "gene_name",
     "gene_id",
@@ -72,16 +71,7 @@ def add_chr_prefix(seqid):
 
 
 def format_coordinates(rep):
-    """
-    Return chromosome-qualified coordinates from the MAJIQ LSV ID.
-
-    Example:
-        lsv_id = ENSG00000182944:s:29273738-29273864
-        seqid  = 22
-
-    Returns:
-        chr22:29273738-29273864
-    """
+    """Return chromosome-qualified coordinates from the MAJIQ LSV ID."""
 
     lsv_id = str(rep.get("lsv_id", "")).strip()
 
@@ -95,43 +85,60 @@ def format_coordinates(rep):
 
     seqid = add_chr_prefix(rep.get("seqid", ""))
 
-    if not seqid:
-        return coordinate
-
-    return f"{seqid}:{coordinate}"
+    return (
+        f"{seqid}:{coordinate}"
+        if seqid
+        else coordinate
+    )
 
 
 def format_junction_coordinates(rep):
     """Return chromosome-qualified junction coordinates."""
 
-    coordinate = str(rep.get("junction_coord", "")).strip()
+    coordinate = str(
+        rep.get("junction_coord", "")
+    ).strip()
 
     if not coordinate or coordinate.lower() == "nan":
         return ""
 
     if ":" in coordinate:
-        return coordinate if coordinate.startswith("chr") else f"chr{coordinate}"
+        return (
+            coordinate
+            if coordinate.startswith("chr")
+            else f"chr{coordinate}"
+        )
 
     seqid = add_chr_prefix(rep.get("seqid", ""))
 
-    return f"{seqid}:{coordinate}" if seqid else coordinate
+    return (
+        f"{seqid}:{coordinate}"
+        if seqid
+        else coordinate
+    )
 
 
 def choose_representative(group, probability_col):
     """Select the junction with the highest probability of changing."""
 
-    valid = group.dropna(subset=[probability_col])
+    valid = group.dropna(
+        subset=[probability_col]
+    )
 
     if valid.empty:
         return None
 
-    return valid.loc[valid[probability_col].idxmax()]
+    return valid.loc[
+        valid[probability_col].idxmax()
+    ]
 
 
 def describe_exon_skipping(rep, dpsi):
     """Describe cassette-exon inclusion or skipping."""
 
-    spliced_with = str(rep.get("spliced_with", "")).strip()
+    spliced_with = str(
+        rep.get("spliced_with", "")
+    ).strip()
 
     if spliced_with == "A":
         return (
@@ -164,7 +171,10 @@ def describe_change(rep, event_type, dpsi_col):
         return "No directional change"
 
     if event_type == "cassette":
-        return describe_exon_skipping(rep, dpsi)
+        return describe_exon_skipping(
+            rep,
+            dpsi,
+        )
 
     if event_type == "tandem_cassette":
         return (
@@ -241,7 +251,7 @@ def describe_change(rep, event_type, dpsi_col):
 
 
 def summarise(df, event_type):
-    """Collapse each MAJIQ event_id to one representative junction."""
+    """Collapse each MAJIQ event ID to one representative junction."""
 
     psi_cols = [
         col
@@ -258,7 +268,9 @@ def summarise(df, event_type):
     probability_cols = [
         col
         for col in df.columns
-        if col.endswith("_probability_changing")
+        if col.endswith(
+            "_probability_changing"
+        )
     ]
 
     if (
@@ -286,13 +298,32 @@ def summarise(df, event_type):
         if rep is None:
             continue
 
+        dpsi = float(rep[dpsi_col])
+        probability = float(
+            rep[probability_col]
+        )
+
         row = {
-            "Gene": rep.get("gene_name", ""),
-            "Gene ID": rep.get("gene_id", ""),
-            "Chr": add_chr_prefix(rep.get("seqid", "")),
-            "Strand": rep.get("strand", ""),
-            "Coordinates": format_coordinates(rep),
-            "Junction coordinates": format_junction_coordinates(rep),
+            "Gene": rep.get(
+                "gene_name",
+                "",
+            ),
+            "Gene ID": rep.get(
+                "gene_id",
+                "",
+            ),
+            "Chr": add_chr_prefix(
+                rep.get("seqid", "")
+            ),
+            "Strand": rep.get(
+                "strand",
+                "",
+            ),
+            "Coordinates": format_coordinates(
+                rep
+            ),
+            "Junction coordinates":
+                format_junction_coordinates(rep),
             "Event ID": event_id,
             "Change": describe_change(
                 rep,
@@ -307,13 +338,17 @@ def summarise(df, event_type):
                 float(rep[psi_cols[1]]),
                 3,
             ),
+            "dPSI": round(
+                dpsi,
+                3,
+            ),
             "|ΔPSI|": round(
-                abs(float(rep[dpsi_col])),
+                abs(dpsi),
                 3,
             ),
             "Significant": (
                 "Yes"
-                if float(rep[probability_col]) >= 0.95
+                if probability >= 0.95
                 else "No"
             ),
         }
@@ -325,9 +360,20 @@ def summarise(df, event_type):
     if out.empty:
         return out
 
-    return out.sort_values(
-        ["Significant", "|ΔPSI|", "Gene"],
-        ascending=[False, False, True],
+    return (
+        out.sort_values(
+            [
+                "Significant",
+                "|ΔPSI|",
+                "Gene",
+            ],
+            ascending=[
+                False,
+                False,
+                True,
+            ],
+        )
+        .reset_index(drop=True)
     )
 
 
@@ -364,8 +410,263 @@ def prepare_summary(df):
     return out
 
 
+def collapse_duplicate_events(events):
+    """
+    Collapse events that occur in more than one MAJIQ event table.
+
+    The generic junctions table can overlap with classified event
+    tables such as cassette or alt3prime. Each Event ID is counted
+    only once in the gene-level summary.
+    """
+
+    rows = []
+
+    for (
+        gene_id,
+        gene_name,
+        event_id,
+    ), group in events.groupby(
+        [
+            "Gene ID",
+            "Gene",
+            "Event ID",
+        ],
+        dropna=False,
+    ):
+        effects = pd.to_numeric(
+            group["dPSI"],
+            errors="coerce",
+        )
+
+        abs_effects = effects.abs()
+
+        if abs_effects.notna().any():
+            representative_index = (
+                abs_effects.idxmax()
+            )
+            representative_effect = effects.loc[
+                representative_index
+            ]
+            max_abs_effect = abs_effects.max()
+        else:
+            representative_effect = 0.0
+            max_abs_effect = 0.0
+
+        event_types = set(
+            group["event_type"]
+            .dropna()
+            .astype(str)
+        )
+
+        # Remove the generic label when a more informative
+        # event classification is available.
+        if (
+            "junctions" in event_types
+            and len(event_types) > 1
+        ):
+            event_types.remove("junctions")
+
+        rows.append(
+            {
+                "Gene ID": gene_id,
+                "Gene": gene_name,
+                "Event ID": event_id,
+                "significant": bool(
+                    group["is_significant"].any()
+                ),
+                "dPSI": representative_effect,
+                "max_abs_effect": max_abs_effect,
+                "event_types": "|".join(
+                    sorted(event_types)
+                ),
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def determine_effect_direction(group):
+    """
+    Determine the direction of MAJIQ effects for one gene.
+
+    Significant events are used when present. Otherwise, all detected
+    events are used.
+    """
+
+    significant = group[
+        group["significant"]
+    ]
+
+    direction_group = (
+        significant
+        if not significant.empty
+        else group
+    )
+
+    effects = pd.to_numeric(
+        direction_group["dPSI"],
+        errors="coerce",
+    ).dropna()
+
+    effects = effects[
+        effects != 0
+    ]
+
+    if effects.empty:
+        return "none"
+
+    has_positive = bool(
+        (effects > 0).any()
+    )
+    has_negative = bool(
+        (effects < 0).any()
+    )
+
+    if has_positive and has_negative:
+        return "mixed"
+
+    if has_positive:
+        return "increased"
+
+    return "decreased"
+
+
+def prepare_gene_summary(event_tables):
+    """Create one standardized gene-level MAJIQ summary."""
+
+    columns = [
+        "gene_id",
+        "gene_name",
+        "method",
+        "detected",
+        "significant",
+        "n_events",
+        "n_significant_events",
+        "max_abs_effect",
+        "effect_direction",
+        "event_types",
+    ]
+
+    if not event_tables:
+        return pd.DataFrame(
+            columns=columns
+        )
+
+    events = pd.concat(
+        event_tables,
+        ignore_index=True,
+    )
+
+    if events.empty:
+        return pd.DataFrame(
+            columns=columns
+        )
+
+    events["is_significant"] = (
+        events["Significant"]
+        .astype(str)
+        .str.lower()
+        .eq("yes")
+    )
+
+    collapsed = collapse_duplicate_events(
+        events
+    )
+
+    if collapsed.empty:
+        return pd.DataFrame(
+            columns=columns
+        )
+
+    rows = []
+
+    for (
+        gene_id,
+        gene_name,
+    ), group in collapsed.groupby(
+        [
+            "Gene ID",
+            "Gene",
+        ],
+        dropna=False,
+    ):
+        event_types = set()
+
+        for value in (
+            group["event_types"]
+            .dropna()
+            .astype(str)
+        ):
+            event_types.update(
+                item
+                for item in value.split("|")
+                if item
+            )
+
+        rows.append(
+            {
+                "gene_id": gene_id,
+                "gene_name": gene_name,
+                "method": "MAJIQ",
+                "detected": True,
+                "significant": bool(
+                    group["significant"].any()
+                ),
+                "n_events": int(
+                    len(group)
+                ),
+                "n_significant_events": int(
+                    group["significant"].sum()
+                ),
+                "max_abs_effect": round(
+                    pd.to_numeric(
+                        group["max_abs_effect"],
+                        errors="coerce",
+                    ).max(),
+                    3,
+                ),
+                "effect_direction":
+                    determine_effect_direction(
+                        group
+                    ),
+                "event_types": "|".join(
+                    sorted(event_types)
+                ),
+            }
+        )
+
+    result = pd.DataFrame(
+        rows,
+        columns=columns,
+    )
+
+    return (
+        result.sort_values(
+            [
+                "significant",
+                "n_significant_events",
+                "max_abs_effect",
+                "gene_name",
+            ],
+            ascending=[
+                False,
+                False,
+                False,
+                True,
+            ],
+        )
+        .reset_index(drop=True)
+    )
+
+
 def main():
-    output_file = Path("MAJIQ_summary.xlsx")
+    output_file = Path(
+        "MAJIQ_summary.xlsx"
+    )
+
+    gene_summary_file = Path(
+        "MAJIQ_gene_summary.tsv"
+    )
 
     writer = pd.ExcelWriter(
         output_file,
@@ -373,9 +674,14 @@ def main():
     )
 
     sheets_written = 0
+    event_tables = []
 
-    for file in sorted(Path(".").glob("*.tsv")):
-        print(f"Processing {file.name}")
+    for file in sorted(
+        Path(".").glob("*.tsv")
+    ):
+        print(
+            f"Processing {file.name}"
+        )
 
         df = pd.read_csv(
             file,
@@ -393,7 +699,9 @@ def main():
         name = file.stem.lower()
 
         if name == "summary":
-            summary = prepare_summary(df)
+            summary = prepare_summary(
+                df
+            )
 
             if summary.empty:
                 print(
@@ -444,12 +752,22 @@ def main():
             )
             continue
 
+        out["event_type"] = name
+
+        event_tables.append(
+            out.copy()
+        )
+
         sheet_name = SHEET_NAMES.get(
             name,
-            file.stem.replace("_", " ").title(),
+            file.stem
+            .replace("_", " ")
+            .title(),
         )[:31]
 
-        out.to_excel(
+        out.drop(
+            columns=["event_type"],
+        ).to_excel(
             writer,
             sheet_name=sheet_name,
             index=False,
@@ -459,7 +777,10 @@ def main():
 
     if sheets_written == 0:
         writer.close()
-        output_file.unlink(missing_ok=True)
+
+        output_file.unlink(
+            missing_ok=True
+        )
 
         raise RuntimeError(
             "No worksheets were generated "
@@ -468,7 +789,23 @@ def main():
 
     writer.close()
 
-    print(f"Finished: {output_file}")
+    gene_summary = prepare_gene_summary(
+        event_tables
+    )
+
+    gene_summary.to_csv(
+        gene_summary_file,
+        sep="\t",
+        index=False,
+    )
+
+    print(
+        f"Finished: {output_file}"
+    )
+
+    print(
+        f"Finished: {gene_summary_file}"
+    )
 
 
 if __name__ == "__main__":

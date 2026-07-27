@@ -53,7 +53,24 @@
                     "type": "string",
                     "description": "Name of iGenomes reference.",
                     "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference."
+                },
+                "star_index": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "description": "Path to a pre-built STAR genome index.",
+                    "help_text": "Directory containing the STAR genome index used for read alignment.",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to the gene annotation GTF file.",
+                    "help_text": "GTF annotation used for STAR alignment, featureCounts, splicing analysis, and downstream annotation.",
+                    "fa_icon": "far fa-file-code"
                 },
                 "fasta": {
                     "type": "string",
@@ -62,7 +79,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "Genome FASTA used by analyses requiring genomic sequence.",
                     "fa_icon": "far fa-file-code"
                 },
                 "transcript_fasta": {
@@ -74,20 +91,127 @@
                     "description": "Path to transcriptome FASTA file.",
                     "help_text": "Transcript FASTA used for Salmon indexing and IsoformSwitchAnalyzeR. Transcript identifiers should match the transcript IDs in the supplied GTF.",
                     "fa_icon": "far fa-file-code"
-            },
+                },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "help_text": "Do not load igenomes.config when running the pipeline."
                 },
                 "igenomes_base": {
                     "type": "string",
-                    "description": "The base path to the igenomes reference files",
+                    "description": "The base path to the iGenomes reference files.",
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "default": "s3://ngi-igenomes/igenomes/"
+                }
+            }
+        },
+        "analysis_selection_options": {
+            "title": "Analysis selection",
+            "type": "object",
+            "fa_icon": "fas fa-sliders-h",
+            "description": "Select the expression and alternative-splicing analyses to run.",
+            "properties": {
+                "run_expression": {
+                    "type": "string",
+                    "default": "true",
+                    "enum": ["true", "false"],
+                    "description": "Run gene-level expression quantification and differential-expression analysis."
+                },
+                "run_splicing": {
+                    "type": "string",
+                    "default": "true",
+                    "enum": ["true", "false"],
+                    "description": "Run alternative-splicing analyses."
+                },
+                "run_majiq": {
+                    "type": "string",
+                    "default": "true",
+                    "enum": ["true", "false"],
+                    "description": "Run MAJIQ alternative-splicing analysis."
+                },
+                "run_rmats": {
+                    "type": "string",
+                    "default": "true",
+                    "enum": ["true", "false"],
+                    "description": "Run rMATS alternative-splicing analysis."
+                },
+                "run_leafcutter": {
+                    "type": "string",
+                    "default": "true",
+                    "enum": ["true", "false"],
+                    "description": "Run LeafCutter differential-splicing analysis."
+                },
+                "run_isa": {
+                    "type": "string",
+                    "default": "false",
+                    "enum": ["true", "false"],
+                    "description": "Run Salmon quantification and IsoformSwitchAnalyzeR."
+                }
+            }
+        },
+        "rmats_options": {
+            "title": "rMATS options",
+            "type": "object",
+            "fa_icon": "fas fa-code-branch",
+            "description": "Parameters controlling rMATS alternative-splicing analysis.",
+            "properties": {
+                "rmats_splice_diff_cutoff": {
+                    "type": "number",
+                    "default": 0.0001,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Splicing-difference cutoff passed to rMATS."
+                },
+                "rmats_paired_stats": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use the paired statistical model in rMATS."
+                },
+                "rmats_read_len": {
+                    "type": "integer",
+                    "default": 40,
+                    "minimum": 1,
+                    "description": "RNA-seq read length supplied to rMATS."
+                },
+                "rmats_novel_splice_site": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Allow detection of splice sites not present in the annotation."
+                },
+                "rmats_min_intron_len": {
+                    "type": "integer",
+                    "default": 50,
+                    "minimum": 1,
+                    "description": "Minimum intron length considered by rMATS."
+                },
+                "rmats_max_exon_len": {
+                    "type": "integer",
+                    "default": 500,
+                    "minimum": 1,
+                    "description": "Maximum exon length considered by rMATS."
+                }
+            }
+        },
+        "leafcutter_options": {
+            "title": "LeafCutter options",
+            "type": "object",
+            "fa_icon": "fas fa-project-diagram",
+            "description": "Parameters controlling LeafCutter splice-junction clustering.",
+            "properties": {
+                "leafcutter_min_cluster_reads": {
+                    "type": "integer",
+                    "default": 50,
+                    "minimum": 1,
+                    "description": "Minimum number of reads required for a LeafCutter intron cluster."
+                },
+                "leafcutter_max_intron_length": {
+                    "type": "integer",
+                    "default": 500000,
+                    "minimum": 1,
+                    "description": "Maximum intron length accepted during LeafCutter clustering."
                 }
             }
         },
@@ -95,25 +219,26 @@
             "title": "IsoformSwitchAnalyzeR",
             "type": "object",
             "fa_icon": "fas fa-project-diagram",
-            "description": "Options controlling transcript-level isoform switch analysis.",
+            "description": "Options controlling transcript-level isoform-switch analysis.",
             "properties": {
-                "run_isa": {
-                    "type": "string",
-                    "default": "false",
-                    "enum": ["true", "false"],
-                    "description": "Run IsoformSwitchAnalyzeR including Salmon quantification."
-                },
                 "isa_gtf": {
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
                     "description": "Optional ISA-specific GTF annotation. Useful for excluding spike-in transcripts such as ERCC controls."
-                }, 
+                },
                 "pfam_hmm": {
                     "type": "string",
                     "format": "file-path",
+                    "exists": true,
                     "description": "Path to the Pfam-A.hmm database."
-                },     
+                },
+                "pfam_clans": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Path to the Pfam clans annotation table."
+                },
                 "isa_alpha": {
                     "type": "number",
                     "default": 0.05,
@@ -128,17 +253,8 @@
                     "maximum": 1,
                     "description": "Minimum absolute change in isoform fraction."
                 }
-            } 
+            }
         },
-        "organism": {
-            "type": "string",
-            "default": "human",
-            "description": "Organism for gene annotation.",
-            "enum": [
-                "human",
-                "mouse"
-            ]
-        },  
         "differential_analysis_options": {
             "title": "Differential analysis options",
             "type": "object",
@@ -161,6 +277,15 @@
                 "contrast_name": {
                     "type": "string",
                     "description": "Optional comparison name. Defaults to '<target>_vs_<reference>'."
+                },          
+                "organism": {
+                    "type": "string",
+                    "default": "human",
+                    "description": "Organism used for gene annotation and enrichment analysis.",
+                    "enum": [
+                        "human",
+                        "mouse"
+                    ]
                 }
             },
             "required": [
@@ -327,16 +452,25 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
+            "$ref": "#/$defs/analysis_selection_options"
+        },
+        {
             "$ref": "#/$defs/differential_analysis_options"
+        },
+        {
+            "$ref": "#/$defs/rmats_options"
+        },
+        {
+            "$ref": "#/$defs/leafcutter_options"
+        },
+        {
+            "$ref": "#/$defs/isoformswitchanalyzer_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
-        },
-        {
-        "$ref": "#/$defs/isoformswitchanalyzer_options"
         }
     ]
 }
