@@ -213,8 +213,9 @@ workflow RMATS {
 
 
     emit:
-    results  = RMATS_SUMMARIZE.out.rmats_post
-    gene_summary = RMATS_SUMMARIZE.out.gene_summary
-    post_log = RMATS_SUMMARIZE.out.log
+    results         = RMATS_SUMMARIZE.out.rmats_post
+    gene_summary    = RMATS_SUMMARIZE.out.gene_summary
+    jc_annotated    = RMATS_SUMMARIZE.out.jc_annotated
+    post_log        = RMATS_SUMMARIZE.out.log
     prep_log = RMATS_RUN.out.log
 }

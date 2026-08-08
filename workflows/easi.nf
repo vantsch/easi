@@ -25,6 +25,8 @@ include { LEAFCUTTER_DS             } from '../modules/local/leafcutter/ds/main'
 include { LEAFCUTTER_DOWNSTREAM     } from '../modules/local/leafcutter/downstream/main'
 include { ISA                       } from '../subworkflows/local/isa/main'
 include { GENE_LEVEL_INTEGRATION    } from '../modules/local/integration/gene_level/main'
+include { SPLICE_REGION_INTEGRATION } from '../modules/local/integration/splice_region/main'
+include { SASHIMI_PLOT              } from '../modules/local/visualization/sashimi/main'
 include { paramsSummaryMap          } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -551,11 +553,6 @@ workflow EASI {
             params.run_isa.toBoolean()
         ) {
 
-            /*
-            --------------------------------------------------------------------------------
-                Combine DESeq2 results and standardized splicing gene summaries
-            --------------------------------------------------------------------------------
-            */
 
             /*
             --------------------------------------------------------------------------------
@@ -601,7 +598,144 @@ workflow EASI {
             )
         }
 
+        /*
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            SPLICE-REGION INTEGRATION AND SASHIMI VISUALISATION
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        */
+
+        if (
+            params.run_majiq.toBoolean() &&
+            params.run_rmats.toBoolean() &&
+            params.run_leafcutter.toBoolean()
+        ) {
+
+            /*
+             * Extract the MAJIQ junction table from the delta-PSI
+             * modulize output.
+             */
+            ch_majiq_junctions = MAJIQ.out.deltapsi_tsv_files
+                .map { files ->
+
+                    def junction_file = files.find { file ->
+                        file.name == 'junctions.tsv'
+                    }
+
+                    if (!junction_file) {
+                        error """
+                        MAJIQ delta-PSI modulize output does not contain
+                        junctions.tsv for contrast '${contrast_name}'.
+                        """.stripIndent()
+                    }
+
+                    tuple(
+                        [id: contrast_name],
+                        junction_file
+                    )
+                }
+
+            /*
+             * Join the three detailed result tables by contrast metadata.
+             */
+            ch_splice_region_integration = ch_majiq_junctions
+                .join(
+                    RMATS.out.jc_annotated,
+                    by: 0
+                )
+                .join(
+                    LEAFCUTTER_DOWNSTREAM.out.introns_annotated,
+                    by: 0
+                )
+
+            SPLICE_REGION_INTEGRATION(
+                ch_splice_region_integration
+            )
+
+            /*
+             * Collect the sample metadata, BAM files and BAM indexes into
+             * aligned lists for the contrast-level sashimi process.
+             *
+             * collect(flat: false) is important because each
+             * (meta, bam, bai) tuple must remain intact.
+             */
+            ch_sashimi_samples = ch_bam_bai
+                .collect(
+                    flat: false
+                )
+                .map { rows ->
+
+                    def ordered_rows = rows.sort { left, right ->
+                        left[0].id.toString()
+                            <=> right[0].id.toString()
+                    }
+
+                    def sample_metadata = ordered_rows.collect { row ->
+                        row[0]
+                    }
+
+                    def bam_files = ordered_rows.collect { row ->
+                        row[1]
+                    }
+
+                    def bai_files = ordered_rows.collect { row ->
+                        row[2]
+                    }
+
+                    tuple(
+                        sample_metadata,
+                        bam_files,
+                        bai_files
+                    )
+                }
+
+            /*
+             * Combine the ranked event table with the complete set of
+             * sample BAMs and indexes.
+             *
+             * Result:
+             *   meta,
+             *   ranked_events,
+             *   sample_metadata,
+             *   BAM list,
+             *   BAI list
+             */
+            ch_sashimi_input =
+                SPLICE_REGION_INTEGRATION.out.ranked_splicing_events
+                    .combine(
+                        ch_sashimi_samples
+                    )
+                    .map {
+                        meta,
+                        ranked_events,
+                        sample_metadata,
+                        bam_files,
+                        bai_files ->
+
+                        tuple(
+                            meta,
+                            ranked_events,
+                            sample_metadata,
+                            bam_files,
+                            bai_files
+                        )
+                    }
+
+            /*
+             * SASHIMI_PLOT expects the GTF as a plain path rather than
+             * the (meta, path) tuple used by other modules.
+             */
+            ch_sashimi_gtf = ch_gtf
+                .map { _gtf_meta, gtf ->
+                    gtf
+                }
+
+            SASHIMI_PLOT(
+                ch_sashimi_input,
+                ch_sashimi_gtf
+            )
+        }
     }
+           
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

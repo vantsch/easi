@@ -1,0 +1,15 @@
+name: easi-sashimi
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - python=3.11
+  - pandas>=2.0
+  - pysam>=0.22
+  - r-base>=4.3
+  - r-ggplot2
+  - r-data.table
+  - r-gridextra
+  - r-gtable

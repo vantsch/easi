@@ -238,15 +238,16 @@ workflow MAJIQ {
 
 
     emit:
-    splicegraph          = ch_majiq_finished_splicegraph
-    sj                   = MAJIQ_BUILDSJ.out.sj
-    psi_coverage         = MAJIQ_PSICOVERAGE.out.psi_coverage
-    deltapsi             = MAJIQ_DELTAPSI.out.dpsicov
-    heterogen            = MAJIQ_HETEROGEN.out.hetcov
-    sgc                  = MAJIQ_SGCOVERAGE.out.sgc_files
-    quantify_modulized   = QUANTIFY_MODULIZE.out.modulize
-    deltapsi_modulized   = DELTAPSI_MODULIZE.out.modulize
-    heterogen_modulized  = HETEROGEN_MODULIZE.out.modulize
-    deltapsi_report      = MAJIQ_SUMMARIZE.out.workbook
-    gene_summary         = MAJIQ_SUMMARIZE.out.gene_summary
+    splicegraph             = ch_majiq_finished_splicegraph
+    sj                      = MAJIQ_BUILDSJ.out.sj
+    psi_coverage            = MAJIQ_PSICOVERAGE.out.psi_coverage
+    deltapsi                = MAJIQ_DELTAPSI.out.dpsicov
+    heterogen               = MAJIQ_HETEROGEN.out.hetcov
+    sgc                     = MAJIQ_SGCOVERAGE.out.sgc_files
+    quantify_modulized      = QUANTIFY_MODULIZE.out.modulize
+    deltapsi_modulized      = DELTAPSI_MODULIZE.out.modulize
+    deltapsi_tsv_files      = DELTAPSI_MODULIZE.out.tsv_files
+    heterogen_modulized     = HETEROGEN_MODULIZE.out.modulize
+    deltapsi_report         = MAJIQ_SUMMARIZE.out.workbook
+    gene_summary            = MAJIQ_SUMMARIZE.out.gene_summary
 }

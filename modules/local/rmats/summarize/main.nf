@@ -34,6 +34,10 @@ process RMATS_SUMMARIZE {
     tuple val(contrast),
         path("${output_dir}/${rmats_output_dir}/RMATS_gene_summary.tsv"),
         emit: gene_summary
+    
+    tuple val(contrast),
+        path("${output_dir}/${rmats_output_dir}/*.MATS.JC.annotated.tsv"),
+        emit: jc_annotated
 
     path "${output_dir}/${logfile}",
         emit: log
