@@ -2,7 +2,6 @@ process MAJIQ_BUILDUPDATE {
 
     tag "${meta.id ?: 'majiq_update'}"
     label 'process_low'
-    secret 'MAJIQ_LICENSE'
 
     input:
     path sj
@@ -13,7 +12,7 @@ process MAJIQ_BUILDUPDATE {
     tuple val(meta), path('splicegraph_updated.zarr'), emit: splicegraph
     tuple val("${task.process}"),
           val('majiq'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/majiq --version'),
+          eval('majiq --version'),
           emit: versions_majiq,
           topic: versions
 
@@ -28,29 +27,27 @@ process MAJIQ_BUILDUPDATE {
         .join('\n')
 
     """
-    export MAJIQ_LICENSE_FILE=\$(mktemp)
-    printf '%s' "\$MAJIQ_LICENSE" >| "\$MAJIQ_LICENSE_FILE"
-
-cat > config.tsv <<'EOF'
-sj	group
-${config_rows}
-EOF
+    cat > config.tsv <<'EOF'
+    sj	group
+    ${config_rows}
+    EOF
 
     echo "MAJIQ group configuration:"
     cat config.tsv
 
-    /Users/ucl/micromamba/envs/majiq/bin/majiq-build \\
-        update \\
-        --nthreads ${task.cpus} \\
-        --groups-tsv config.tsv \\
-        ${splicegraph} \\
-        splicegraph_updated.zarr \\
+    majiq-build \
+        update \
+        --nthreads ${task.cpus} \
+        --groups-tsv config.tsv \
+        ${splicegraph} \
+        splicegraph_updated.zarr \
         ${args}
     """
 
     stub:
     """
     mkdir -p splicegraph_updated.zarr
-    echo "Stub updated splicegraph content" > splicegraph_updated.zarr/dummy_file.txt
+    echo "Stub updated splicegraph content" \
+        > splicegraph_updated.zarr/dummy_file.txt
     """
 }

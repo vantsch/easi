@@ -2,7 +2,6 @@ process MAJIQ_HETEROGEN {
 
     tag "${contrast}"
     label 'process_medium'
-    secret 'MAJIQ_LICENSE'
 
     input:
     tuple val(contrast),
@@ -18,7 +17,7 @@ process MAJIQ_HETEROGEN {
     path("heterogen/${contrast}.heterogen.logger.txt"), emit: logger
     tuple val("${task.process}"),
           val('majiq'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/majiq --version'),
+          eval('majiq --version'),
           emit: versions_majiq,
           topic: versions
 
@@ -29,22 +28,19 @@ process MAJIQ_HETEROGEN {
     def args = task.ext.args ?: ''
 
     """
-    export MAJIQ_LICENSE_FILE=\$(mktemp)
-    printf '%s' "\$MAJIQ_LICENSE" >| "\$MAJIQ_LICENSE_FILE"
-
     mkdir -p heterogen
 
-    /Users/ucl/micromamba/envs/majiq/bin/majiq \\
-        heterogen \\
-        --nthreads ${task.cpus} \\
-        --splicegraph ${splicegraph} \\
-        -psi1 ${control_files} \\
-        -psi2 ${treatment_files} \\
-        --names ${control} ${treatment} \\
-        --output-tsv heterogen/${contrast}.heterogen.tsv \\
-        --logger heterogen/${contrast}.heterogen.logger.txt \\
-        --output-voila heterogen/${contrast}.hetcov \\
-        --debug \\
+    majiq \
+        heterogen \
+        --nthreads ${task.cpus} \
+        --splicegraph ${splicegraph} \
+        -psi1 ${control_files} \
+        -psi2 ${treatment_files} \
+        --names ${control} ${treatment} \
+        --output-tsv heterogen/${contrast}.heterogen.tsv \
+        --logger heterogen/${contrast}.heterogen.logger.txt \
+        --output-voila heterogen/${contrast}.hetcov \
+        --debug \
         ${args}
     """
 

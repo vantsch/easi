@@ -2,7 +2,6 @@ process MAJIQ_DELTAPSI {
 
     tag "${contrast}"
     label 'process_medium'
-    secret 'MAJIQ_LICENSE'
 
     input:
     tuple val(contrast),
@@ -18,7 +17,7 @@ process MAJIQ_DELTAPSI {
     path("deltapsi/${contrast}.deltapsi.logger.txt"), emit: logger
     tuple val("${task.process}"),
           val('majiq'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/majiq --version'),
+          eval('majiq --version'),
           emit: versions_majiq,
           topic: versions
 
@@ -30,23 +29,20 @@ process MAJIQ_DELTAPSI {
     def args = task.ext.args ?: ''
 
     """
-    export MAJIQ_LICENSE_FILE=\$(mktemp)
-    printf '%s' "\$MAJIQ_LICENSE" >| "\$MAJIQ_LICENSE_FILE"
-
     mkdir -p deltapsi
 
-    /Users/ucl/micromamba/envs/majiq/bin/majiq \\
-        deltapsi \\
-        --nthreads ${task.cpus} \\
-        --splicegraph ${splicegraph} \\
-        -psi1 ${control_files} \\
-        -psi2 ${treatment_files} \\
-        --names ${control} ${treatment} \\
-        --changing-threshold ${changing_threshold} \\
-        --output-tsv deltapsi/${contrast}.deltapsi.tsv \\
-        --logger deltapsi/${contrast}.deltapsi.logger.txt \\
-        --output-voila deltapsi/${contrast}.dpsicov \\
-        --debug \\
+    majiq \
+        deltapsi \
+        --nthreads ${task.cpus} \
+        --splicegraph ${splicegraph} \
+        -psi1 ${control_files} \
+        -psi2 ${treatment_files} \
+        --names ${control} ${treatment} \
+        --changing-threshold ${changing_threshold} \
+        --output-tsv deltapsi/${contrast}.deltapsi.tsv \
+        --logger deltapsi/${contrast}.deltapsi.logger.txt \
+        --output-voila deltapsi/${contrast}.dpsicov \
+        --debug \
         ${args}
     """
 

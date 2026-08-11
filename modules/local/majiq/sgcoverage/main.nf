@@ -2,7 +2,6 @@ process MAJIQ_SGCOVERAGE {
 
     tag "${condition}"
     label 'process_single'
-    secret 'MAJIQ_LICENSE'
 
     input:
     tuple val(condition),
@@ -14,7 +13,7 @@ process MAJIQ_SGCOVERAGE {
     tuple val(condition), path("*.sgc"), emit: sgc_files
     tuple val("${task.process}"),
           val('majiq'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/majiq --version'),
+          eval('majiq --version'),
           emit: versions_majiq,
           topic: versions
 
@@ -25,20 +24,18 @@ process MAJIQ_SGCOVERAGE {
     def args = task.ext.args ?: ''
 
     """
-    export MAJIQ_LICENSE_FILE=\$(mktemp)
-    printf '%s' "\$MAJIQ_LICENSE" >| "\$MAJIQ_LICENSE_FILE"
-
-    /Users/ucl/micromamba/envs/majiq/bin/majiq-v3 \\
-        sg-coverage \\
-        ${splicegraph} \\
-        ${condition}.sgc \\
-        ${sj_files} \\
-        --nthreads ${task.cpus} \\
+    majiq-v3 \
+        sg-coverage \
+        ${splicegraph} \
+        ${condition}.sgc \
+        ${sj_files} \
+        --nthreads ${task.cpus} \
         ${args}
     """
 
     stub:
     """
-    echo "This is a stub .sgc file for ${condition}" > ${condition}.sgc
+    echo "This is a stub .sgc file for ${condition}" \
+        > ${condition}.sgc
     """
 }

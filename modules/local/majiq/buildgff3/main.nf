@@ -2,7 +2,6 @@ process MAJIQ_BUILDGFF3 {
 
     tag "${meta.id ?: 'annotation'}"
     label 'process_single'
-    secret 'MAJIQ_LICENSE'
 
     input:
     tuple val(meta), path(gff)
@@ -11,7 +10,7 @@ process MAJIQ_BUILDGFF3 {
     tuple val(meta), path('splicegraph.zarr'), emit: splicegraph
     tuple val("${task.process}"),
           val('majiq'),
-          eval('/Users/ucl/micromamba/envs/majiq/bin/majiq --version'),
+          eval('majiq --version'),
           emit: versions_majiq,
           topic: versions
 
@@ -22,13 +21,10 @@ process MAJIQ_BUILDGFF3 {
     def args = task.ext.args ?: ''
 
     """
-    export MAJIQ_LICENSE_FILE=\$(mktemp)
-    printf '%s' "\$MAJIQ_LICENSE" >| "\$MAJIQ_LICENSE_FILE"
-
-    /Users/ucl/micromamba/envs/majiq/bin/majiq-build \\
-        gff3 \\
-        ${gff} \\
-        splicegraph.zarr \\
+    majiq-build \
+        gff3 \
+        ${gff} \
+        splicegraph.zarr \
         ${args}
     """
 
