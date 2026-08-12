@@ -15,7 +15,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { EASI  } from './workflows/easi'
+include { EASI_DIFFERENTIAL       } from './workflows/differential'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_easi_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_easi_pipeline'
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_easi_pipeline'
@@ -43,22 +43,46 @@ params.fasta = getGenomeAttribute('fasta')
 workflow NFCORE_EASI {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    samplesheet
 
     main:
 
-    //
-    // WORKFLOW: Run pipeline
-    //
-    EASI (
-        samplesheet,
-        params.multiqc_config,
-        params.multiqc_logo,
-        params.multiqc_methods_description,
-        params.outdir,
-    )
+    def ch_multiqc_report = channel.empty()
+
+    if (params.mode == 'differential') {
+
+        EASI_DIFFERENTIAL(
+            samplesheet,
+            params.multiqc_config,
+            params.multiqc_logo,
+            params.multiqc_methods_description,
+            params.outdir
+        )
+
+        ch_multiqc_report = EASI_DIFFERENTIAL.out.multiqc_report
+
+    } else if (params.mode == 'profiling') {
+
+        error "EASI profiling mode is not implemented yet."
+
+    } else if (params.mode == 'timecourse') {
+
+        error "EASI timecourse mode is not implemented yet."
+
+    } else {
+
+        error """
+        Invalid EASI mode: '${params.mode}'
+
+        Valid modes:
+          differential
+          profiling
+          timecourse
+        """.stripIndent()
+    }
+
     emit:
-    multiqc_report = EASI.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = ch_multiqc_report
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,0 +1,1454 @@
+
+[1m[38;5;232m[48;5;43m N E X T F L O W [0;2m  ~  [mversion 26.04.4[m
+[K
+Launching[35m `./main.nf` [0;2m[[0;1;36mcondescending_leibniz[0;2m] [0;36mrevision: [0;36m4f8292bed9[m
+[K
+WARN: Unrecognized config option 'validation.defaultIgnoreParams'
+WARN: Unrecognized config option 'validation.monochromeLogs'
+
+-[2m----------------------------------------------------[0m-
+                                        [0;32m,--.[0;30m/[0;32m,-.[0m
+[0;34m        ___     __   __   __   ___     [0;32m/,-._.--~'[0m
+[0;34m  |\ | |__  __ /  ` /  \ |__) |__         [0;33m}  {[0m
+[0;34m  | \| |       \__, \__/ |  \ |___     [0;32m\`-._,-`-,[0m
+                                        [0;32m`._,._,'[0m
+[0;35m  nf-core/easi 1.0.0dev[0m
+-[2m----------------------------------------------------[0m-
+
+[1mInput/output options[0m
+  [0;34minput                    : [0;32mtests/data/samplesheet.csv[0m
+  [0;34moutdir                   : [0;32mresults[0m
+
+[1mReference genome options[0m
+  [0;34mstar_index               : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/ref_genomes/GRCh38_chr22_ERCC/STAR[0m
+  [0;34mgtf                      : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/ref_genomes/GRCh38_chr22_ERCC/annotation/chr22_with_ERCC92.gtf[0m
+  [0;34mfasta                    : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/ref_genomes/GRCh38_chr22_ERCC/fasta/chr22_with_ERCC92.fa[0m
+  [0;34mtranscript_fasta         : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/ref_genomes/GRCh38_chr22_ERCC/annotation/chr22_without_ERCC_isa_transcripts.fa[0m
+
+[1mAnalysis selection[0m
+  [0;34mrun_isa                  : [0;32mtrue[0m
+
+[1mIsoformSwitchAnalyzeR[0m
+  [0;34misa_gtf                  : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/ref_genomes/GRCh38_chr22_ERCC/annotation/chr22_without_ERCC_isa.gtf[0m
+  [0;34mpfam_hmm                 : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/databases/Pfam/38.0/Pfam-A.hmm[0m
+  [0;34mpfam_clans               : [0;32m/Users/ucl/Desktop/Work/Bioinformatics/databases/Pfam/38.0/Pfam-A.clans.tsv[0m
+
+[1mDifferential analysis options[0m
+  [0;34mcontrast_reference       : [0;32mHBR[0m
+  [0;34mcontrast_target          : [0;32mUHR[0m
+
+[1mGeneric options[0m
+  [0;34mtrace_report_suffix      : [0;32m2026-08-12_12-03-36[0m
+
+[1mCore Nextflow options[0m
+  [0;34mrunName                  : [0;32mcondescending_leibniz[0m
+  [0;34mcontainerEngine          : [0;32mdocker[0m
+  [0;34mcontainer.MAJIQ_SUMMARIZE: [0;32mcommunity.wave.seqera.io/library/pip_openpyxl_pandas:6a8c6a3118605483[0m
+  [0;34mlaunchDir                : [0;32m/Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi[0m
+  [0;34mworkDir                  : [0;32m/Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work[0m
+  [0;34mprojectDir               : [0;32m/Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi[0m
+  [0;34muserName                 : [0;32mucl[0m
+  [0;34mprofile                  : [0;32mdocker,emulate_amd64[0m
+  [0;34mconfigFiles              : [0;32m/Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/nextflow.config[0m
+
+!! Only displaying parameters that differ from the pipeline defaults !!
+-[2m----------------------------------------------------[0m-
+
+* The nf-core framework
+    https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+    https://github.com/nf-core/easi/blob/master/CITATIONS.md
+
+[33mWARN: The following invalid input values have been detected:
+
+* --gene_id_col: Geneid
+* --deseq2_formula: ~ condition
+* --star_readfiles_command: zcat
+* --sample_id_col: sample
+* --deseq2_comparison: condition_UHR_vs_HBR
+
+[39m[K
+[33mWARN: nf-core pipelines do not accept positional arguments. The positional argument `differential` has been detected.
+HINT: A common mistake is to provide multiple values separated by spaces e.g. `-profile test, docker`.
+[39m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT              -[K
+[41A
+[2mexecutor >  local (4)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/aa/39c5fbb30e5b5ed9dc6ae9eab5a79caa/39c5fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mUHR_Rep3[2m)[m       [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                  [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED              [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL          -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                      -[K
+[43A
+[2mexecutor >  local (5)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/aa/39c5fbb30e5b5ed9dc6ae9eab5a79caa/39c5fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mUHR_Rep3[2m)[m       [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                  [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED              [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL          -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                      -[K
+[43A
+[2mexecutor >  local (7)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/98/8026c2888c70c7f5ea62c20be5744f98/8026c2]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep1[2m)[m       [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                  [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED              [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL          -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                      -[K
+[43A
+[2mexecutor >  local (8)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/3f/9c7cf8a10c93ad993b4331d52deb5c3f/9c7cf8]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep2[2m)[m                 [2m [[0;34m 66%[0;2m][m 4 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                            [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (8)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE                            [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (9)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/67/289abfa3515ba3631eeb93cc2dcaf467/289abf]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep2[2m)[m                 [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (9)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/67/289abfa3515ba3631eeb93cc2dcaf467/289abf]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep2[2m)[m                 [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (10)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/67/289abfa3515ba3631eeb93cc2dcaf467/289abf]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep2[2m)[m                 [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                        [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (11)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/55/b202f493a882e0cfbdadac0f8c055755/b202f4]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep3[2m)[m                 [2m [[0;34m 33%[0;2m][m 2 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                        [2m [[0;34m  0%[0;2m][m 0 of 2[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                            [2m [[0;34m  0%[0;2m][m 0 of 2[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (11)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                 [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/55/b202f493a882e0cfbdadac0f8c055755/b202f4]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep3[2m)[m                 [2m [[0;34m 33%[0;2m][m 2 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                        [2m [[0;34m  0%[0;2m][m 0 of 2[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                            [2m [[0;34m  0%[0;2m][m 0 of 2[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                         -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m          [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE               -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                        -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION              -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                           -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                -[K
+[43A
+[2mexecutor >  local (12)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/05/0b38fb0ef27393fb4cce8b2deb1dfd05/0b38fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                                          [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (12)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/05/0b38fb0ef27393fb4cce8b2deb1dfd05/0b38fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED                                          [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (13)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/05/0b38fb0ef27393fb4cce8b2deb1dfd05/0b38fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (14)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/05/0b38fb0ef27393fb4cce8b2deb1dfd05/0b38fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 33%[0;2m][m 1 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (14)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/05/0b38fb0ef27393fb4cce8b2deb1dfd05/0b38fb]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mUHR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 33%[0;2m][m 1 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (15)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/ed/418eb274fa619ac226d8156fca78bced/418eb2]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 33%[0;2m][m 1 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (15)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/ed/418eb274fa619ac226d8156fca78bced/418eb2]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep1[2m)[m                                   [2m [[0;34m 50%[0;2m][m 3 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 33%[0;2m][m 1 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 3[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (16)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/ed/418eb274fa619ac226d8156fca78bced/418eb2]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep1[2m)[m                                   [2m [[0;34m 66%[0;2m][m 4 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 25%[0;2m][m 1 of 4[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 4[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (16)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/ed/418eb274fa619ac226d8156fca78bced/418eb2]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep1[2m)[m                                   [2m [[0;34m 66%[0;2m][m 4 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 25%[0;2m][m 1 of 4[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 4[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (17)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/5c/e69326925de0550b21e5462ffdf5bb5c/e69326]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep2[2m)[m                                   [2m [[0;34m 83%[0;2m][m 5 of 6[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/22/086dee04c2b956780a92f564da8a3322/086dee]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep2[2m)[m                               [2m [[0;34m 20%[0;2m][m 1 of 5[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 5[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3                                   [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[43A
+[2mexecutor >  local (19)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/5c/e69326925de0550b21e5462ffdf5bb5c/e69326]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep2[2m)[m                                   [2m [[0;34m 83%[0;2m][m 5 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/84/55cd52099ffd7f446a11cd7520ca6784/55cd52]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep1[2m)[m                               [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[44A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/40/1ffcb0d788ba12fe8a4eba990f61ea40/1ffcb0]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mHBR_Rep2[2m)[m                               [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[69A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/40/1ffcb0d788ba12fe8a4eba990f61ea40/1ffcb0]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mHBR_Rep2[2m)[m                               [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[31m ✘[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+Execution cancelled -- Finishing pending tasks before exit[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[31mERROR ~ Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[73A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/40/1ffcb0d788ba12fe8a4eba990f61ea40/1ffcb0]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mHBR_Rep2[2m)[m                               [2m [[0;34m 16%[0;2m][m 1 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[31m ✘[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+Execution cancelled -- Finishing pending tasks before exit[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[31mERROR ~ Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[73A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/ae/1115e0d44059f69a2191b61d8896b7ae/1115e0]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep3[2m)[m                               [2m [[0;34m 33%[0;2m][m 2 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[31m ✘[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+Execution cancelled -- Finishing pending tasks before exit[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[31mERROR ~ Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[73A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f8/ba1110482459afb72256ff0755bc9df8/ba1110]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mHBR_Rep1[2m)[m                               [2m [[0;34m 66%[0;2m][m 4 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[31m ✘[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+Execution cancelled -- Finishing pending tasks before exit[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[31mERROR ~ Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[73A
+[2mexecutor >  local (21)[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/26/fda273be3d4998a97d412a82ef3a1b26/fda273]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_RAW[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/f6/a7e8d327ca86f0344867e83b85998ff6/a7e8d3]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mTRIMGALORE[33;2m ([0;33mHBR_Rep3[2m)[m                                   [2m [[0;32m100%[0;2m][m 6 of 6[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/84/55cd52099ffd7f446a11cd7520ca6784/55cd52]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFASTQC_TRIMMED[33;2m ([0;33mUHR_Rep1[2m)[m                               [2m [[0;34m 83%[0;2m][m 5 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSTAR_ALIGN                                              [2m [[0;34m  0%[0;2m][m 0 of 6[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSAMTOOLS_INDEX                                           -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/e7/59182aaefa472ffee14f568fe5073ce7/59182a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mBEDOPS_GTF2BED[33;2m ([0;33mchr22_with_ERCC92.gtf[2m)[m                  [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_INFEREXPERIMENT                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mRSEQC_STRANDNESS                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSUBREAD_FEATURECOUNTS                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mFEATURECOUNTS_MERGE                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mDESEQ2_DIFFERENTIAL                                      -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/c9/e4520541969e3df7a579bd7d76711cc9/e45205]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mAGAT_CONVERTSPGXF2GXF[33;2m ([0;33mnull[2m)[m                            [2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb52/da4154]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDGFF3[33;2m ([0;33mannotation[2m)[m                      [2m [[0;34m  0%[0;2m][m 0 of 1[31m ✘[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDSJ                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_BUILDUPDATE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_PSICOVERAGE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_QUANTIFY                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_DELTAPSI                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_HETEROGEN                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SGCOVERAGE                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mQUANTIFY_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mDELTAPSI_MODULIZE                                  -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mHETEROGEN_MODULIZE                                 -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:[mMAJIQ_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mCREATE_BAMLIST                                     -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_RUN                                          -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:RMATS:[mRMATS_SUMMARIZE                                    -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mREGTOOLS_JUNCTIONSEXTRACT                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_CLUSTER                                       -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DS                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mLEAFCUTTER_DOWNSTREAM                                    -[K
+[2m[[0;34m]8;;file:///Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/8a/9ec13a12e204a6c0a4278873c784f78a/9ec13a]8;;[0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_INDEX[33;2m ([0;33mchr22_without_ERCC_isa_transcripts.fa[2m)[m[2m [[0;32m100%[0;2m][m 1 of 1[32m ✔[m[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mSALMON_QUANT                                         -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART1                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_SCAN                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mPFAM_FORMAT_ISA                                      -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:ISA:[mISA_PART2                                            -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mGENE_LEVEL_INTEGRATION                                   -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSPLICE_REGION_INTEGRATION                                -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mSASHIMI_PLOT                                             -[K
+[2m[[0;34m-        [0;2m] [0;2mNFCORE_EASI:EASI_DIFFERENTIAL:[mMULTIQC                                                  -[K
+Execution cancelled -- Finishing pending tasks before exit[K
+-[0;35m[nf-core/easi][0;31m Pipeline completed with errors[0m-[K
+[33mWARN: Task runtime metrics are not reported when using macOS without a container engine[39m[K
+[31mERROR ~ Error executing process > 'NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)'[K
+[K
+Caused by:[K
+  Process `NFCORE_EASI:EASI_DIFFERENTIAL:MAJIQ:MAJIQ_BUILDGFF3 (annotation)` terminated with an error exit status (1)[K
+[K
+[K
+Command executed:[K
+[K
+  majiq-build         gff3         null.agat.gff         splicegraph.zarr[K
+[K
+Command exit status:[K
+  1[K
+[K
+Command output:[K
+  (empty)[K
+[K
+Command error:[K
+  ERROR: --majiq_env is required when MAJIQ is enabled.[K
+[K
+Work dir:[K
+  /Users/ucl/Desktop/Work/Projects/EASI_pipeline/nf-core-easi/work/52/da4154515998bf369bbdfa473dedeb[K
+[K
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+[31mERROR ~ Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting[K
+[K
+ -- Check '.nextflow.log' file for details[39m[K
+

@@ -23,24 +23,23 @@ process MAJIQ_BUILDUPDATE {
     def args = task.ext.args ?: ''
 
     def config_rows = list_conditions
-        .collect { pair -> "${pair[0]}\t${pair[1]}" }
+        .collect { pair ->
+            "printf '%s\\t%s\\n' '${pair[0]}' '${pair[1]}' >> config.tsv"
+        }
         .join('\n')
 
     """
-    cat > config.tsv <<'EOF'
-    sj	group
+    printf 'sj\\tgroup\\n' > config.tsv
     ${config_rows}
-    EOF
 
     echo "MAJIQ group configuration:"
     cat config.tsv
 
-    majiq-build \
-        update \
-        --nthreads ${task.cpus} \
-        --groups-tsv config.tsv \
+    majiq-v3 build \
         ${splicegraph} \
         splicegraph_updated.zarr \
+        --groups-tsv config.tsv \
+        --nthreads ${task.cpus} \
         ${args}
     """
 

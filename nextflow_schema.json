@@ -114,6 +114,16 @@
             "fa_icon": "fas fa-sliders-h",
             "description": "Select the expression and alternative-splicing analyses to run.",
             "properties": {
+                "mode": {
+                    "type": "string",
+                    "default": "differential",
+                    "enum": [
+                        "differential",
+                        "profiling",
+                        "timecourse"
+                    ],
+                    "description": "Select the EASI analysis mode."
+                },
                 "run_expression": {
                     "type": "string",
                     "default": "true",

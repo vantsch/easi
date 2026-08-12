@@ -39,7 +39,7 @@ include { methodsDescriptionText    } from '../subworkflows/local/utils_nfcore_e
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow EASI {
+workflow EASI_DIFFERENTIAL {
 
     take:
     ch_samplesheet
