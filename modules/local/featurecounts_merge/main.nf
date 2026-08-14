@@ -2,6 +2,8 @@ process FEATURECOUNTS_MERGE {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
+    
+    container 'community.wave.seqera.io/library/pip_openpyxl_pandas:6a8c6a3118605483'
 
     input:
     path counts

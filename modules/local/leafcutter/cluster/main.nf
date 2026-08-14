@@ -4,7 +4,7 @@ process LEAFCUTTER_CLUSTER {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'docker.io/library/easi-leafcutter:1.2'
+    container 'ghcr.io/vantsch/easi-leafcutter:1.2'
 
     input:
     tuple val(meta), path(junc_files), val(groups)

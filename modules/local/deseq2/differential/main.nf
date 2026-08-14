@@ -3,7 +3,7 @@ process DESEQ2_DIFFERENTIAL {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container 'docker.io/library/easi-deseq2:1.1'
+    container 'ghcr.io/vantsch/easi-deseq2:1.1'
     
     input:
     tuple val(meta), val(contrast_variable), val(reference), val(target), val(formula), val(comparison)
