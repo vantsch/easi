@@ -791,7 +791,7 @@ hallmark_gsea <- GSEA(
   verbose = FALSE
 )
 
-hallmark_gsea_df <- as.data.frame(hallmark_gsea)
+hallmark_barplot_df <- hallmark_gsea_df
 
 if (nrow(hallmark_gsea_df) > 0) {
   
@@ -838,26 +838,62 @@ if (nrow(hallmark_gsea_df) > 0) {
   print(hallmark_dotplot)
   dev.off()
   
-  hallmark_barplot <- barplot(hallmark_gsea, showCategory = 20) +
-    ggtitle("Hallmark GSEA")
-  
+  hallmark_barplot_df <- as.data.frame(hallmark_gsea)
+
+  hallmark_barplot_df <- hallmark_barplot_df[
+    order(abs(hallmark_barplot_df[["NES"]]), decreasing = TRUE),
+  ]
+
+  hallmark_barplot_df <- head(hallmark_barplot_df, 20)
+
+  hallmark_barplot_df[["pathway"]] <- factor(
+    hallmark_barplot_df[["pathway"]],
+    levels = rev(hallmark_barplot_df[["pathway"]])
+  )
+
+  hallmark_barplot <- ggplot(
+    hallmark_barplot_df,
+    aes(
+      x = NES,
+      y = pathway,
+      fill = p.adjust
+    )
+  ) +
+    geom_col() +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    labs(
+      title = "Hallmark GSEA",
+      x = "Normalized enrichment score",
+      y = NULL,
+      fill = "Adjusted p-value"
+    ) +
+    theme_bw(base_size = 14)
+
   pdf(
-    file = paste(opt[["output_prefix"]], "hallmark_gsea.barplot.pdf", sep = "."),
+    file = paste(
+      opt[["output_prefix"]],
+      "hallmark_gsea.barplot.pdf",
+      sep = "."
+    ),
     width = 9,
     height = 7
   )
   print(hallmark_barplot)
   dev.off()
-  
+
   png(
-    file = paste(opt[["output_prefix"]], "hallmark_gsea.barplot.png", sep = "."),
+    file = paste(
+      opt[["output_prefix"]],
+      "hallmark_gsea.barplot.png",
+      sep = "."
+    ),
     width = 1600,
     height = 1300,
     res = 200
   )
   print(hallmark_barplot)
   dev.off()
-  
+    
 } else {
   
   warning("No Hallmark GSEA terms returned; skipping GSEA plots.")
