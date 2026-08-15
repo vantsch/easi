@@ -791,13 +791,7 @@ hallmark_gsea <- GSEA(
   verbose = FALSE
 )
 
-hallmark_barplot_df <- as.data.frame(hallmark_gsea)
-
-hallmark_barplot_df[["pathway"]] <- gsub(
-  "_",
-  " ",
-  sub("^HALLMARK_", "", hallmark_barplot_df[["Description"]])
-)
+hallmark_gsea_df <- as.data.frame(hallmark_gsea)
 
 if (nrow(hallmark_gsea_df) > 0) {
   
@@ -844,19 +838,18 @@ if (nrow(hallmark_gsea_df) > 0) {
   print(hallmark_dotplot)
   dev.off()
   
-  hallmark_barplot_df <- as.data.frame(hallmark_gsea)
-
-  hallmark_barplot_df <- hallmark_barplot_df[
-    order(abs(hallmark_barplot_df[["NES"]]), decreasing = TRUE),
+  # Barplot: top 20 pathways by absolute normalized enrichment score
+  hallmark_barplot_df <- hallmark_gsea_df[
+    order(abs(hallmark_gsea_df[["NES"]]), decreasing = TRUE),
   ]
-
+  
   hallmark_barplot_df <- head(hallmark_barplot_df, 20)
-
+  
   hallmark_barplot_df[["pathway"]] <- factor(
     hallmark_barplot_df[["pathway"]],
     levels = rev(hallmark_barplot_df[["pathway"]])
   )
-
+  
   hallmark_barplot <- ggplot(
     hallmark_barplot_df,
     aes(
@@ -874,7 +867,7 @@ if (nrow(hallmark_gsea_df) > 0) {
       fill = "Adjusted p-value"
     ) +
     theme_bw(base_size = 14)
-
+  
   pdf(
     file = paste(
       opt[["output_prefix"]],
@@ -886,7 +879,7 @@ if (nrow(hallmark_gsea_df) > 0) {
   )
   print(hallmark_barplot)
   dev.off()
-
+  
   png(
     file = paste(
       opt[["output_prefix"]],
@@ -899,7 +892,7 @@ if (nrow(hallmark_gsea_df) > 0) {
   )
   print(hallmark_barplot)
   dev.off()
-    
+  
 } else {
   
   warning("No Hallmark GSEA terms returned; skipping GSEA plots.")
