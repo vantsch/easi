@@ -204,11 +204,12 @@ if ( ! is.null(opt\$seed)){
 }
 
 # Check if required parameters have been provided
-if (is_valid_string(opt\$formula)) {
-  required_opts <- c('output_prefix', 'contrast_string')
-} else {
-  required_opts <- c('contrast_variable', 'reference_level', 'target_level', 'output_prefix')
+required_opts <- c('contrast_variable', 'output_prefix')
+
+if (!is_valid_string(opt[["contrast_string"]])) {
+  required_opts <- c(required_opts, 'reference_level', 'target_level')
 }
+
 missing <- required_opts[!unlist(lapply(opt[required_opts], is_valid_string)) | !required_opts %in% names(opt)]
 
 if (length(missing) > 0){
@@ -299,18 +300,23 @@ if (length(missing_samples) > 0) {
 ## CHECK CONTRAST SPECIFICATION               ##
 ################################################
 ################################################
-if (! is_valid_string(opt[["formula"]])) {
-  blocking.vars <- c()
 
-  if (!contrast_variable %in% colnames(sample.sheet)) {
-    stop(
-      paste0(
-        'Chosen contrast variable \"',
-        contrast_variable,
-        '\" not in sample sheet'
-      )
+blocking.vars <- c()
+
+if (!contrast_variable %in% colnames(sample.sheet)) {
+  stop(
+    paste0(
+      'Chosen contrast variable \"',
+      contrast_variable,
+      '\" not in sample sheet'
     )
-  } else if (any(!c(opt\$reference_level, opt\$target_level) %in% sample.sheet[[contrast_variable]])) {
+  )
+}
+
+# For the standard target-vs-reference comparison, validate both levels and
+# explicitly set the requested reference level in the DESeq2 design.
+if (!is_valid_string(opt[["contrast_string"]])) {
+  if (any(!c(opt[["reference_level"]], opt[["target_level"]]) %in% sample.sheet[[contrast_variable]])) {
     stop(
       paste(
         'Please choose reference and treatment levels that are present in the',
@@ -318,27 +324,37 @@ if (! is_valid_string(opt[["formula"]])) {
         'column of the sample sheet'
       )
     )
-  } else if (is_valid_string(opt\$blocking_variables)) {
-    blocking.vars = make.names(unlist(strsplit(opt\$blocking_variables, split = ';')))
-    if (!all(blocking.vars %in% colnames(sample.sheet))) {
-      missing_block <- paste(blocking.vars[! blocking.vars %in% colnames(sample.sheet)], collapse = ',')
-      stop(
-        paste(
-          'Blocking variables', missing_block,
-          'do not correspond to sample sheet columns.'
-        )
+  }
+
+  sample.sheet[[contrast_variable]] <- relevel(
+    as.factor(sample.sheet[[contrast_variable]]),
+    ref = opt[["reference_level"]]
+  )
+}
+
+if (!is_valid_string(opt[["formula"]]) && is_valid_string(opt[["blocking_variables"]])) {
+  blocking.vars = make.names(unlist(strsplit(opt[["blocking_variables"]], split = ';')))
+  if (!all(blocking.vars %in% colnames(sample.sheet))) {
+    missing_block <- paste(blocking.vars[! blocking.vars %in% colnames(sample.sheet)], collapse = ',')
+    stop(
+      paste(
+        'Blocking variables', missing_block,
+        'do not correspond to sample sheet columns.'
       )
-    }
+    )
+  }
+}
+
+# Optionally, subset to only the samples involved in the contrast
+if (opt[["subset_to_contrast_samples"]]){
+  if (!is_valid_string(opt[["reference_level"]]) || !is_valid_string(opt[["target_level"]])) {
+    stop("subset_to_contrast_samples requires reference_level and target_level.")
   }
 
-  # Optionally, subset to only the samples involved in the contrast
-  if (opt\$subset_to_contrast_samples){
-    sample_selector <- sample.sheet[[contrast_variable]] %in% c(opt\$target_level, opt\$reference_level)
-    selected_samples <- sample.sheet[sample_selector, opt\$sample_id_col]
-    count.table <- count.table[, selected_samples]
-    sample.sheet <- sample.sheet[selected_samples, ]
-  }
-
+  sample_selector <- sample.sheet[[contrast_variable]] %in% c(opt[["target_level"]], opt[["reference_level"]])
+  selected_samples <- sample.sheet[sample_selector, opt[["sample_id_col"]]]
+  count.table <- count.table[, selected_samples]
+  sample.sheet <- sample.sheet[selected_samples, ]
 }
 # Optionally, remove samples with specified values in a given field (probably
 # don't use this as well as the above)
@@ -525,8 +541,33 @@ if (!is.null(opt\$contrast_string)) {
 
   comp.results <- run_results(contrast = contrast_var_tg_ref)
   if (opt\$shrink_lfc) {
-    comp.results <- run_shrink(contrast = contrast_var_tg_ref)
+    coef_name <- paste0(
+      contrast_variable,
+      "_",
+      make.names(opt[["target_level"]]),
+      "_vs_",
+      make.names(opt[["reference_level"]])
+    )
+
+    if (!coef_name %in% resultsNames(dds)) {
+      stop(
+        paste0(
+          "Could not identify DESeq2 coefficient '",
+          coef_name,
+          "' required for apeglm shrinkage. Available coefficients: ",
+          paste(resultsNames(dds), collapse = ", ")
+        )
+      )
+    }
+
+    comp.results <- run_shrink(coef = coef_name)
   }
+
+  opt[["contrast_string"]] <- paste(
+    opt[["target_level"]],
+    opt[["reference_level"]],
+    sep = "_vs_"
+  )
 }
 
 comp.results <- data.frame(
