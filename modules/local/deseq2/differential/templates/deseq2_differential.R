@@ -791,7 +791,13 @@ hallmark_gsea <- GSEA(
   verbose = FALSE
 )
 
-hallmark_barplot_df <- hallmark_gsea_df
+hallmark_barplot_df <- as.data.frame(hallmark_gsea)
+
+hallmark_barplot_df[["pathway"]] <- gsub(
+  "_",
+  " ",
+  sub("^HALLMARK_", "", hallmark_barplot_df[["Description"]])
+)
 
 if (nrow(hallmark_gsea_df) > 0) {
   
