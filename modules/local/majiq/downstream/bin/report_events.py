@@ -22,6 +22,7 @@ EVENT_FILES = {
 
 SKIP_FILES = {
     "heatmap",
+    "junctions",
     "other",
     "p_alt3prime",
     "p_alt5prime",
@@ -737,6 +738,33 @@ def main():
             print(
                 f"Skipping {file.name}: "
                 "no event_id column"
+            )
+            continue
+
+        scalar_summary_cols = [
+            col
+            for col in df.columns
+            if (
+                col.endswith("_median_psi")
+                or col.endswith("_median_dpsi")
+                or col.endswith("_probability_changing")
+            )
+        ]
+
+        has_vector_values = any(
+            df[col]
+            .dropna()
+            .astype(str)
+            .str.contains(";", regex=False)
+            .any()
+            for col in scalar_summary_cols
+        )
+
+        if has_vector_values:
+            print(
+                f"Skipping {file.name}: "
+                "vector-valued MAJIQ fields are not supported "
+                "by the scalar event summary"
             )
             continue
 

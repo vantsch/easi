@@ -284,11 +284,12 @@ read_gtf_genes <- function(gtf_file) {
     if (grepl("\\.gz$", gtf_file, ignore.case = TRUE)) {
         gtf_command <- paste(
             "gzip -dc",
-            shQuote(gtf_file)
+            shQuote(gtf_file),
+            "| grep -v '^#'"
         )
     } else {
         gtf_command <- paste(
-            "cat",
+            "grep -v '^#'",
             shQuote(gtf_file)
         )
     }
@@ -322,13 +323,6 @@ read_gtf_genes <- function(gtf_file) {
         "frame",
         "attribute"
     )
-
-    # fread does not apply a comment character when reading through cmd.
-    gtf <- gtf[
-        !startsWith(gtf[["seqname"]], "#"),
-        ,
-        drop = FALSE
-    ]
 
     gtf[["start"]] <- as.integer(gtf[["start"]])
     gtf[["end"]] <- as.integer(gtf[["end"]])
@@ -1021,7 +1015,7 @@ save_enrichment_plots <- function(
     dpi = 200
   )
   
-  bar_plot <- enrichplot::barplot(
+  bar_plot <- barplot(
     enrichment_result,
     showCategory = show_category
   ) +

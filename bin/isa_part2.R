@@ -784,6 +784,10 @@ switchPlotTopSwitches(
     pathToOutput = "switch_plots",
     filterForConsequences = TRUE,
     splitFunctionalConsequences = FALSE,
+    IFcutoff = 0,
+    additionalArguments = list(
+        plotTopology = FALSE
+    ),
     quiet = TRUE
 )
 

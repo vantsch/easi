@@ -12,7 +12,6 @@ include { MAJIQ_QUANTIFY                          } from '../../../modules/local
 include { MAJIQ_DELTAPSI                          } from '../../../modules/local/majiq/deltapsi/main'
 include { MAJIQ_HETEROGEN                         } from '../../../modules/local/majiq/heterogen/main'
 include { MAJIQ_SGCOVERAGE                        } from '../../../modules/local/majiq/sgcoverage/main'
-include { MAJIQ_MODULIZE as QUANTIFY_MODULIZE     } from '../../../modules/local/majiq/modulize/main'
 include { MAJIQ_MODULIZE as DELTAPSI_MODULIZE     } from '../../../modules/local/majiq/modulize/main'
 include { MAJIQ_MODULIZE as HETEROGEN_MODULIZE    } from '../../../modules/local/majiq/modulize/main'
 include { MAJIQ_SUMMARIZE                         } from '../../../modules/local/majiq/downstream/main'
@@ -60,25 +59,22 @@ workflow MAJIQ {
     /*
      * Update the reference splice graph using detected junctions
      */
-    ch_majiq_sj_condition_map = MAJIQ_BUILDSJ.out.sj
-        .collect()
-        .map { collected ->
-            collected.collate(2)
+    ch_majiq_sj_collected = MAJIQ_BUILDSJ.out.sj
+        .toSortedList { a, b ->
+            a[0].id.toString() <=> b[0].id.toString()
         }
-        .map { pairs ->
-            pairs.collect { pair ->
-                [pair[1].name.toString(), pair[0].condition]
+
+    ch_majiq_sj_files = ch_majiq_sj_collected
+        .map { rows ->
+            rows.collect { row ->
+                row[1]
             }
         }
 
-    ch_majiq_sj_files = MAJIQ_BUILDSJ.out.sj
-        .collect()
-        .map { collected ->
-            collected.collate(2)
-        }
-        .map { pairs ->
-            pairs.collect { pair ->
-                pair[1]
+    ch_majiq_sj_condition_map = ch_majiq_sj_collected
+        .map { rows ->
+            rows.collect { row ->
+                [row[1].name.toString(), row[0].condition]
             }
         }
 
@@ -98,6 +94,14 @@ workflow MAJIQ {
             tuple(meta.condition, sj_file)
         }
         .groupTuple()
+        .map { condition, sj_files ->
+            tuple(
+                condition,
+                sj_files.sort { a, b ->
+                    a.name.toString() <=> b.name.toString()
+                }
+            )
+        }
         .combine(ch_majiq_finished_splicegraph)
 
     MAJIQ_PSICOVERAGE(
@@ -157,22 +161,6 @@ workflow MAJIQ {
      */
     MAJIQ_SGCOVERAGE(
         ch_majiq_condition_samples_sj
-    )
-
-    /*
-     * Modulize quantified PSI results
-     */
-    ch_majiq_modulize_input_quantify = MAJIQ_SGCOVERAGE.out.sgc_files
-        .collect { it[1] }
-        .combine(
-            MAJIQ_PSICOVERAGE.out.psi_coverage
-                .collect { it[1] }
-        )
-        .toList()
-        .combine(ch_majiq_finished_splicegraph)
-
-    QUANTIFY_MODULIZE(
-        ch_majiq_modulize_input_quantify
     )
 
     /*
@@ -244,7 +232,6 @@ workflow MAJIQ {
     deltapsi                = MAJIQ_DELTAPSI.out.dpsicov
     heterogen               = MAJIQ_HETEROGEN.out.hetcov
     sgc                     = MAJIQ_SGCOVERAGE.out.sgc_files
-    quantify_modulized      = QUANTIFY_MODULIZE.out.modulize
     deltapsi_modulized      = DELTAPSI_MODULIZE.out.modulize
     deltapsi_tsv_files      = DELTAPSI_MODULIZE.out.tsv_files
     heterogen_modulized     = HETEROGEN_MODULIZE.out.modulize

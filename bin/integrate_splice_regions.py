@@ -26,12 +26,8 @@ for a regional hit.
 
 Outputs
 -------
-<prefix>.normalized_connections.tsv
-<prefix>.tool_event_regions.tsv
-<prefix>.all_region_overlaps.tsv
-<prefix>.significant_region_overlaps.tsv
-<prefix>.multi_tool_region_summary.tsv
 <prefix>.ranked_splicing_events.tsv
+<prefix>.significant_region_overlaps.tsv
 <prefix>.splice_region_integration.xlsx
 """
 
@@ -941,7 +937,36 @@ def parse_majiq(
 
     rows: list[dict[str, Any]] = []
 
-    for index in frame.index:
+    valid_coordinates = (
+        starts.notna()
+        & ends.notna()
+        & (starts < ends)
+    )
+
+    if (~valid_coordinates).any():
+        skipped = frame.loc[
+            ~valid_coordinates,
+            [
+                module_column,
+                event_column,
+                coordinate_column,
+                "source_row",
+            ],
+        ]
+
+        print(
+            f"Skipping {len(skipped)} MAJIQ rows "
+            f"without valid canonical junction coordinates "
+            f"from {path.name}",
+            file=sys.stderr,
+        )
+
+        print(
+            skipped.head(10).to_string(index=False),
+            file=sys.stderr,
+        )
+
+    for index in frame.index[valid_coordinates]:
         rows.append(
             {
                 "dataset_id": (
@@ -4555,6 +4580,132 @@ def build_ranked_splicing_events(
     ]
 
 
+def _select_report_columns(
+    frame: pd.DataFrame,
+    columns: list[str],
+) -> pd.DataFrame:
+    """Return a copy containing only requested user-facing columns."""
+
+    report = frame.copy()
+
+    for column in columns:
+        if column not in report.columns:
+            report[column] = pd.NA
+
+    return report[columns].copy()
+
+
+def simplify_ranked_events(
+    ranked_events: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build the compact ranked-event table.
+
+    Every row in the ranked table is significant by construction, so the
+    duplicated detected/significant tool fields can be represented by one
+    tools column and one n_tools column.
+    """
+
+    frame = ranked_events.copy()
+
+    if "significant_tools" in frame.columns:
+        frame["tools"] = frame[
+            "significant_tools"
+        ]
+    elif "tools_detected" in frame.columns:
+        frame["tools"] = frame[
+            "tools_detected"
+        ]
+    else:
+        frame["tools"] = pd.NA
+
+    if "n_tools_significant" in frame.columns:
+        frame["n_tools"] = pd.to_numeric(
+            frame["n_tools_significant"],
+            errors="coerce",
+        ).astype("Int64")
+
+    elif "n_tools_detected" in frame.columns:
+        frame["n_tools"] = pd.to_numeric(
+            frame["n_tools_detected"],
+            errors="coerce",
+        ).astype("Int64")
+
+    else:
+        frame["n_tools"] = pd.Series(
+            pd.NA,
+            index=frame.index,
+            dtype="Int64",
+        )
+
+    frame["tool_events"] = (
+        frame["event_groups"]
+        if "event_groups" in frame.columns
+        else pd.NA
+    )
+
+    return _select_report_columns(
+        frame,
+        [
+            "rank",
+            "default_sashimi_plot",
+            "ranking_class",
+            "gene_names",
+            "gene_ids",
+            "chromosome",
+            "strand",
+            "region_start",
+            "region_end",
+            "sashimi_region",
+            "tools",
+            "n_tools",
+            "tool_events",
+            "event_types",
+            "strongest_support",
+            "minimum_reciprocal_overlap",
+            "max_abs_effect",
+        ],
+    )
+
+
+def simplify_significant_overlaps(
+    significant_overlaps: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build the compact cross-tool overlap audit table.
+
+    This table contains only significant cross-tool overlap hits, so columns
+    merely restating that both events are significant or that the overlap
+    threshold passed are intentionally omitted.
+    """
+
+    return _select_report_columns(
+        significant_overlaps,
+        [
+            "gene_names",
+            "gene_ids",
+            "chromosome",
+            "strand",
+            "tool_a",
+            "tool_group_id_a",
+            "event_types_a",
+            "region_start_a",
+            "region_end_a",
+            "tool_b",
+            "tool_group_id_b",
+            "event_types_b",
+            "region_start_b",
+            "region_end_b",
+            "support_class",
+            "reciprocal_overlap",
+            "n_exact_connections",
+            "n_same_intron_loci",
+            "n_shared_donor_sites",
+            "n_shared_acceptor_sites",
+        ],
+    )
+
+
 def write_excel_sheet(
     writer: pd.ExcelWriter,
     frame: pd.DataFrame,
@@ -4567,35 +4718,43 @@ def write_excel_sheet(
             sheet_name=sheet_name,
             index=False,
         )
+        return
 
-    else:
-        pd.DataFrame(
-            {
-                "message": [
-                    (
-                        f"{sheet_name} contains "
-                        f"{len(frame):,} rows and exceeds "
-                        f"the Excel worksheet limit. "
-                        f"Use the TSV output."
-                    )
-                ]
-            }
-        ).to_excel(
-            writer,
-            sheet_name=sheet_name,
-            index=False,
-        )
+    pd.DataFrame(
+        {
+            "message": [
+                (
+                    f"{sheet_name} contains "
+                    f"{len(frame):,} rows and exceeds "
+                    "the Excel worksheet limit. "
+                    "Use the TSV output."
+                )
+            ]
+        }
+    ).to_excel(
+        writer,
+        sheet_name=sheet_name,
+        index=False,
+    )
 
 
 def write_workbook(
     path: Path,
     ranked_events: pd.DataFrame,
-    multi_tool_summary: pd.DataFrame,
     significant_overlaps: pd.DataFrame,
-    all_overlaps: pd.DataFrame,
-    event_regions: pd.DataFrame,
-    connections: pd.DataFrame,
 ) -> None:
+    """
+    Write only the two useful user-facing integration tables.
+    """
+
+    # Keep this flag in the TSV because it is pipeline-facing sashimi
+    # metadata, but do not expose it as a biological result in Excel.
+    ranked_excel = ranked_events.drop(
+        columns=[
+            "default_sashimi_plot",
+        ],
+        errors="ignore",
+    )
 
     with pd.ExcelWriter(
         path,
@@ -4604,14 +4763,8 @@ def write_workbook(
 
         write_excel_sheet(
             writer,
-            ranked_events,
+            ranked_excel,
             "Ranked splicing events",
-        )
-
-        write_excel_sheet(
-            writer,
-            multi_tool_summary,
-            "Multi-tool regions",
         )
 
         write_excel_sheet(
@@ -4620,43 +4773,8 @@ def write_workbook(
             "Significant overlaps",
         )
 
-        write_excel_sheet(
-            writer,
-            all_overlaps,
-            "All overlaps",
-        )
-
-        write_excel_sheet(
-            writer,
-            event_regions.drop(
-                columns=[
-                    "_scope",
-                    "event_key",
-                ],
-                errors="ignore",
-            ),
-            "Tool event regions",
-        )
-
-        write_excel_sheet(
-            writer,
-            connections.drop(
-                columns=[
-                    "_scope",
-                    "event_key",
-                ],
-                errors="ignore",
-            ),
-            "All connections",
-        )
-
-        for worksheet in (
-            writer.book.worksheets
-        ):
-            worksheet.freeze_panes = (
-                "A2"
-            )
-
+        for worksheet in writer.book.worksheets:
+            worksheet.freeze_panes = "A2"
             worksheet.auto_filter.ref = (
                 worksheet.dimensions
             )
@@ -4664,6 +4782,14 @@ def write_workbook(
 
 def main() -> int:
     args = parse_arguments()
+
+    # ------------------------------------------------------------------
+    # Integration
+    #
+    # Keep the established algorithm unchanged. These large intermediate
+    # dataframes remain in memory because they are required to build the
+    # final result, but they are no longer exported as redundant files.
+    # ------------------------------------------------------------------
 
     connections = normalise_connections(
         pd.concat(
@@ -4737,31 +4863,31 @@ def main() -> int:
         )
     )
 
+    # ------------------------------------------------------------------
+    # Compact user-facing reports
+    # ------------------------------------------------------------------
+
+    ranked_report = simplify_ranked_events(
+        ranked_events
+    )
+
+    overlap_report = (
+        simplify_significant_overlaps(
+            significant_overlaps
+        )
+    )
+
     args.outdir.mkdir(
         parents=True,
         exist_ok=True,
     )
 
     paths = {
-        "connections": (
+        "ranked_events": (
             args.outdir
             / (
                 f"{args.prefix}"
-                ".normalized_connections.tsv"
-            )
-        ),
-        "event_regions": (
-            args.outdir
-            / (
-                f"{args.prefix}"
-                ".tool_event_regions.tsv"
-            )
-        ),
-        "all_overlaps": (
-            args.outdir
-            / (
-                f"{args.prefix}"
-                ".all_region_overlaps.tsv"
+                ".ranked_splicing_events.tsv"
             )
         ),
         "significant_overlaps": (
@@ -4769,20 +4895,6 @@ def main() -> int:
             / (
                 f"{args.prefix}"
                 ".significant_region_overlaps.tsv"
-            )
-        ),
-        "multi_tool_summary": (
-            args.outdir
-            / (
-                f"{args.prefix}"
-                ".multi_tool_region_summary.tsv"
-            )
-        ),
-        "ranked_events": (
-            args.outdir
-            / (
-                f"{args.prefix}"
-                ".ranked_splicing_events.tsv"
             )
         ),
         "workbook": (
@@ -4794,73 +4906,15 @@ def main() -> int:
         ),
     }
 
-    connections.drop(
-        columns=[
-            "_scope",
-            "event_key",
-        ],
-        errors="ignore",
-    ).to_csv(
-        paths["connections"],
+    ranked_report.to_csv(
+        paths["ranked_events"],
         sep="\t",
         index=False,
         na_rep="NA",
     )
 
-    event_regions.drop(
-        columns=[
-            "_scope",
-            "event_key",
-        ],
-        errors="ignore",
-    ).to_csv(
-        paths["event_regions"],
-        sep="\t",
-        index=False,
-        na_rep="NA",
-    )
-
-    all_overlaps.drop(
-        columns=[
-            "event_key_a",
-            "event_key_b",
-        ],
-        errors="ignore",
-    ).to_csv(
-        paths["all_overlaps"],
-        sep="\t",
-        index=False,
-        na_rep="NA",
-    )
-
-    significant_overlaps.drop(
-        columns=[
-            "event_key_a",
-            "event_key_b",
-        ],
-        errors="ignore",
-    ).to_csv(
-        paths[
-            "significant_overlaps"
-        ],
-        sep="\t",
-        index=False,
-        na_rep="NA",
-    )
-
-    multi_tool_summary.to_csv(
-        paths[
-            "multi_tool_summary"
-        ],
-        sep="\t",
-        index=False,
-        na_rep="NA",
-    )
-
-    ranked_events.to_csv(
-        paths[
-            "ranked_events"
-        ],
+    overlap_report.to_csv(
+        paths["significant_overlaps"],
         sep="\t",
         index=False,
         na_rep="NA",
@@ -4868,43 +4922,31 @@ def main() -> int:
 
     write_workbook(
         paths["workbook"],
-        ranked_events,
-        multi_tool_summary,
-        significant_overlaps.drop(
-            columns=[
-                "event_key_a",
-                "event_key_b",
-            ],
-            errors="ignore",
-        ),
-        all_overlaps.drop(
-            columns=[
-                "event_key_a",
-                "event_key_b",
-            ],
-            errors="ignore",
-        ),
-        event_regions,
-        connections,
+        ranked_report,
+        overlap_report,
     )
 
+    # ------------------------------------------------------------------
+    # Provenance/debug information remains available in the process log.
+    # ------------------------------------------------------------------
+
     print(
-        f"Connections: "
+        f"Connections considered: "
         f"{len(connections):,}"
     )
 
     print(
-        f"Tool event regions: "
+        f"Tool event regions considered: "
         f"{len(event_regions):,}"
     )
 
     print(
-        f"Overlapping event pairs: "
+        f"Overlapping event pairs considered: "
         f"{len(all_overlaps):,}"
     )
 
     print(
-        f"Significant reciprocal-overlap hits: "
+        "Significant reciprocal-overlap hits: "
         f"{len(significant_overlaps):,}"
     )
 
@@ -4915,12 +4957,12 @@ def main() -> int:
 
     print(
         f"Ranked significant regions: "
-        f"{len(ranked_events):,}"
+        f"{len(ranked_report):,}"
     )
 
     print(
-        f"Default sashimi regions: "
-        f"{int(ranked_events['default_sashimi_plot'].sum()):,}"
+        "Default sashimi regions: "
+        f"{int(ranked_report['default_sashimi_plot'].fillna(False).sum()):,}"
     )
 
     for label, path in paths.items():

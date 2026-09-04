@@ -7,15 +7,21 @@ output:
     theme: flatly
     code_folding: hide
 params:
-  prefix: "UHR_vs_HBR"
-
+  prefix: "comparison"
 ---
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 prefix <- params$prefix
+comparison <- gsub("_vs_", " vs ", prefix)
 
 read_tsv_if_exists <- function(file) {
   if (file.exists(file)) {
-    read.delim(file, sep = "\t", header = TRUE, check.names = FALSE)
+    read.delim(
+      file,
+      sep = "\t",
+      header = TRUE,
+      check.names = FALSE
+    )
   } else {
     NULL
   }
@@ -36,16 +42,42 @@ show_image <- function(file) {
     cat("File not available.")
   }
 }
+
+results <- read_tsv_if_exists(
+  paste0(prefix, ".deseq2.results.tsv")
+)
+
+genes_tested <- if (!is.null(results)) {
+  nrow(results)
+} else {
+  NA_integer_
+}
+
+significant_genes <- if (!is.null(results) && "padj" %in% colnames(results)) {
+  sum(!is.na(results$padj) & results$padj < 0.05)
+} else {
+  NA_integer_
+}
 ```
+
 # Overview
 
-| Item | Value |
-|------|------|
-| Comparison | UHR vs HBR |
-| Design | ~ condition |
-| Samples | 6 |
-| Genes tested | 20,345 |
-| Significant genes (padj < 0.05) | 1,245 |
+```{r overview, echo=FALSE}
+overview <- data.frame(
+  Item = c(
+    "Comparison",
+    "Genes tested",
+    "Significant genes (padj < 0.05)"
+  ),
+  Value = c(
+    comparison,
+    genes_tested,
+    significant_genes
+  )
+)
+
+knitr::kable(overview)
+```
 
 ---
 
@@ -53,17 +85,21 @@ show_image <- function(file) {
 
 ## PCA
 
-![](UHR_vs_HBR.deseq2.PCA.labelled.png)
-
-Short interpretation:
-- Samples cluster by condition.
-- No obvious outliers.
+```{r pca, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".deseq2.PCA.labelled.png")
+)
+```
 
 ---
 
 ## Dispersion estimates
 
-![](UHR_vs_HBR.deseq2.dispersion.png)
+```{r dispersion, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".deseq2.dispersion.png")
+)
+```
 
 ---
 
@@ -71,24 +107,28 @@ Short interpretation:
 
 ## Volcano plot
 
-![](UHR_vs_HBR.deseq2.volcano.png)
+```{r volcano, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".deseq2.volcano.png")
+)
+```
 
 ---
 
 ## MA plot
 
-```{r ma-plot, echo=FALSE, out.width="80%"}
-show_image(paste(prefix, "deseq2.MA.png", sep = "."))
+```{r ma-plot, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".deseq2.MA.png")
+)
 ```
 
 ---
 
 ## Top differentially expressed genes
 
-```{r, echo=FALSE}
-knitr::kable(
-  head(read.delim("UHR_vs_HBR.deseq2.results.tsv"),50)
-)
+```{r top-degs, echo=FALSE}
+show_table(results, 50)
 ```
 
 ---
@@ -97,47 +137,72 @@ knitr::kable(
 
 ## Hallmark pathways
 
-```{r, echo=FALSE}
-hallmark <- read.delim("UHR_vs_HBR.hallmark_gsea.tsv")
-knitr::kable(head(hallmark,20))
+```{r hallmark-table, echo=FALSE}
+hallmark <- read_tsv_if_exists(
+  paste0(prefix, ".hallmark_gsea.tsv")
+)
+
+show_table(hallmark, 20)
 ```
 
-![](UHR_vs_HBR.hallmark_gsea.dotplot.png)
+```{r hallmark-plot, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".hallmark_gsea.dotplot.png")
+)
+```
 
 ---
 
 ## GO Biological Process
 
-![](UHR_vs_HBR.go_BP_ora.dotplot.png)
+```{r go-bp-plot, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".go_BP_ora.dotplot.png")
+)
+```
 
-```{r, echo=FALSE}
-go <- read.delim("UHR_vs_HBR.go_BP_ora.tsv")
-knitr::kable(head(go,20))
+```{r go-bp-table, echo=FALSE}
+go_bp <- read_tsv_if_exists(
+  paste0(prefix, ".go_BP_ora.tsv")
+)
+
+show_table(go_bp, 20)
 ```
 
 ---
 
 ## GO Molecular Function
 
-![](UHR_vs_HBR.go_MF_ora.dotplot.png)
+```{r go-mf-plot, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".go_MF_ora.dotplot.png")
+)
+```
 
 ---
 
 ## GO Cellular Component
 
-![](UHR_vs_HBR.go_CC_ora.dotplot.png)
+```{r go-cc-plot, echo=FALSE, out.width="90%"}
+show_image(
+  paste0(prefix, ".go_CC_ora.dotplot.png")
+)
+```
 
 ---
 
 # Output files
 
 ```{r output-files, echo=FALSE, results='asis'}
-files <- list.files(pattern = paste0("^", prefix, "\\."))
+files <- list.files(
+  pattern = paste0("^", prefix, "\\.")
+)
 
 if (length(files) == 0) {
   cat("No output files found.")
 } else {
   cat("<ul>")
+  
   for (f in files) {
     cat(sprintf(
       '<li><a href="%s" download>%s</a></li>',
@@ -145,13 +210,15 @@ if (length(files) == 0) {
       f
     ))
   }
+  
   cat("</ul>")
 }
 ```
+
 ---
 
 # Session information
 
-```{r, echo=FALSE}
+```{r session-info, echo=FALSE}
 sessionInfo()
 ```

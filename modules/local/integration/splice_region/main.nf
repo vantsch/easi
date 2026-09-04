@@ -15,32 +15,16 @@ process SPLICE_REGION_INTEGRATION {
 
     output:
     tuple val(meta),
-          path("splice_region_integration/${meta.id}.normalized_connections.tsv"),
-          emit: normalized_connections
-
-    tuple val(meta),
-          path("splice_region_integration/${meta.id}.tool_event_regions.tsv"),
-          emit: tool_event_regions
-
-    tuple val(meta),
-          path("splice_region_integration/${meta.id}.all_region_overlaps.tsv"),
-          emit: all_region_overlaps
-
-    tuple val(meta),
           path("splice_region_integration/${meta.id}.significant_region_overlaps.tsv"),
           emit: significant_region_overlaps
-
-    tuple val(meta),
-          path("splice_region_integration/${meta.id}.multi_tool_region_summary.tsv"),
-          emit: multi_tool_region_summary
 
     tuple val(meta),
           path("splice_region_integration/${meta.id}.splice_region_integration.xlsx"),
           emit: workbook
 
     tuple val(meta),
-            path("splice_region_integration/${meta.id}.ranked_splicing_events.tsv"),
-            emit: ranked_splicing_events
+          path("splice_region_integration/${meta.id}.ranked_splicing_events.tsv"),
+          emit: ranked_splicing_events
 
     tuple val("${task.process}"),
           val('python'),
@@ -73,11 +57,7 @@ process SPLICE_REGION_INTEGRATION {
     """
     mkdir -p splice_region_integration
 
-    touch splice_region_integration/${meta.id}.normalized_connections.tsv
-    touch splice_region_integration/${meta.id}.tool_event_regions.tsv
-    touch splice_region_integration/${meta.id}.all_region_overlaps.tsv
     touch splice_region_integration/${meta.id}.significant_region_overlaps.tsv
-    touch splice_region_integration/${meta.id}.multi_tool_region_summary.tsv
     touch splice_region_integration/${meta.id}.splice_region_integration.xlsx
     touch splice_region_integration/${meta.id}.ranked_splicing_events.tsv
     """
