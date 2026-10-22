@@ -359,6 +359,7 @@ def validate_config(
                 "abs_log2fc"
             ]
         )
+
     except (
         KeyError,
         TypeError,
@@ -401,6 +402,7 @@ def validate_config(
         ][
             "agreement_bonus"
         ]
+
     except (
         KeyError,
         TypeError,
@@ -422,6 +424,7 @@ def validate_config(
                     method
                 ]
             )
+
         except (
             TypeError,
             ValueError,
@@ -451,6 +454,7 @@ def validate_config(
                     category
                 ]
             )
+
         except (
             TypeError,
             ValueError,
@@ -487,6 +491,7 @@ def validate_config(
                 "maximum"
             ]
         )
+
     except (
         TypeError,
         ValueError,
@@ -994,24 +999,6 @@ def load_deseq2_results(
         )
     )
 
-    effect_direction = pd.Series(
-        pd.NA,
-        index=dataframe.index,
-        dtype="string",
-    )
-
-    effect_direction.loc[
-        log2fc.gt(0)
-    ] = "up"
-
-    effect_direction.loc[
-        log2fc.lt(0)
-    ] = "down"
-
-    effect_direction.loc[
-        log2fc.eq(0)
-    ] = "unchanged"
-
     result = pd.DataFrame(
         {
             "gene_id": gene_id,
@@ -1019,11 +1006,7 @@ def load_deseq2_results(
             "method": "deseq2",
             "detected": detected,
             "significant": significant,
-            "n_events": 1,
-            "n_significant_events": significant.astype(int),
-            "max_abs_effect": log2fc.abs(),
-            "effect_direction": effect_direction,
-            "event_types": "expression",
+            "log2fc": log2fc,
         }
     )
 
@@ -1053,30 +1036,27 @@ def load_deseq2_results(
         .astype(bool)
     )
 
-    result[
-        "n_events"
-    ] = (
-        result[
-            "n_events"
-        ]
-        .fillna(0)
-        .astype(int)
-    )
+    if result[
+        "gene_id"
+    ].duplicated().any():
+        duplicated = result.loc[
+            result[
+                "gene_id"
+            ].duplicated(
+                keep=False
+            ),
+            "gene_id",
+        ].unique()
 
-    result[
-        "n_significant_events"
-    ] = (
-        result[
-            "n_significant_events"
-        ]
-        .fillna(0)
-        .astype(int)
-    )
-
-    result = collapse_duplicate_genes(
-        result,
-        "deseq2",
-    )
+        raise ValueError(
+            "DESeq2 results contain duplicated gene IDs after ID normalization: "
+            + ", ".join(
+                map(
+                    str,
+                    duplicated[:10],
+                )
+            )
+        )
 
     return result.reset_index(
         drop=True
@@ -1315,13 +1295,10 @@ def rename_method_columns(
         "detected": f"{method}_detected",
         "significant": f"{method}_significant",
         "n_events": f"{method}_n_events",
-        "n_significant_events": (
-            f"{method}_n_significant_events"
-        ),
+        "n_significant_events": f"{method}_n_significant_events",
         "max_abs_effect": f"{method}_max_abs_effect",
-        "effect_direction": (
-            f"{method}_effect_direction"
-        ),
+        "effect_direction": f"{method}_effect_direction",
+        "log2fc": f"{method}_log2fc",
         "event_types": f"{method}_event_types",
     }
 
@@ -1401,14 +1378,6 @@ def integrate_methods(
             f"{method}_significant"
         )
 
-        n_events_column = (
-            f"{method}_n_events"
-        )
-
-        n_significant_column = (
-            f"{method}_n_significant_events"
-        )
-
         integrated[
             detected_column
         ] = (
@@ -1427,6 +1396,15 @@ def integrate_methods(
             ]
             .fillna(False)
             .astype(bool)
+        )
+
+    for method in SPLICING_METHODS:
+        n_events_column = (
+            f"{method}_n_events"
+        )
+
+        n_significant_column = (
+            f"{method}_n_significant_events"
         )
 
         integrated[
@@ -1579,6 +1557,7 @@ def integrate_methods(
                 ]
             )
         )
+
     else:
         integrated[
             "splicing_category_score"
@@ -1620,6 +1599,7 @@ def integrate_methods(
                 )
             )
         )
+
     else:
         integrated[
             "agreement_bonus"
@@ -1724,23 +1704,23 @@ def make_short_table(
 def make_long_table(
     integrated: pd.DataFrame,
 ) -> pd.DataFrame:
+    """
+    Create the comprehensive gene-level table used by easiR.
+
+    Internal helper columns used to construct the ranking, such as
+    *_method and *_rank_component, are deliberately not exported.
+    """
+
     columns = [
         "gene_rank",
         "gene_id",
         "gene_name",
         "gene_rank_score",
 
-        "deseq2_method",
         "deseq2_detected",
         "deseq2_significant",
-        "deseq2_n_events",
-        "deseq2_n_significant_events",
-        "deseq2_max_abs_effect",
-        "deseq2_effect_direction",
-        "deseq2_event_types",
-        "deseq2_rank_component",
+        "deseq2_log2fc",
 
-        "majiq_method",
         "majiq_detected",
         "majiq_significant",
         "majiq_n_events",
@@ -1748,9 +1728,7 @@ def make_long_table(
         "majiq_max_abs_effect",
         "majiq_effect_direction",
         "majiq_event_types",
-        "majiq_rank_component",
 
-        "rmats_method",
         "rmats_detected",
         "rmats_significant",
         "rmats_n_events",
@@ -1758,9 +1736,7 @@ def make_long_table(
         "rmats_max_abs_effect",
         "rmats_effect_direction",
         "rmats_event_types",
-        "rmats_rank_component",
 
-        "leafcutter_method",
         "leafcutter_detected",
         "leafcutter_significant",
         "leafcutter_n_events",
@@ -1768,9 +1744,7 @@ def make_long_table(
         "leafcutter_max_abs_effect",
         "leafcutter_effect_direction",
         "leafcutter_event_types",
-        "leafcutter_rank_component",
 
-        "isa_method",
         "isa_detected",
         "isa_significant",
         "isa_n_events",
@@ -1778,7 +1752,6 @@ def make_long_table(
         "isa_max_abs_effect",
         "isa_effect_direction",
         "isa_event_types",
-        "isa_rank_component",
 
         "expression_significant",
         "splicing_significant",
@@ -1791,12 +1764,16 @@ def make_long_table(
         "agreement_bonus",
     ]
 
-    return integrated[
-        columns
-    ].rename(
-        columns={
-            "gene_name": "gene_symbol",
-        }
+    return (
+        integrated[
+            columns
+        ]
+        .rename(
+            columns={
+                "gene_name": "gene_symbol",
+            }
+        )
+        .copy()
     )
 
 
@@ -1823,6 +1800,7 @@ def flatten_config(
                     child_prefix,
                 )
             )
+
     else:
         rows.append(
             {
@@ -1832,6 +1810,63 @@ def flatten_config(
         )
 
     return rows
+
+
+def write_gene_integration_tsv(
+    dataframe: pd.DataFrame,
+    path: Path,
+    prefix: str,
+) -> None:
+    metadata = [
+        "# EASI gene integration ranking",
+        (
+            "# expression_category_score = "
+            "category_weight_expression * method_weight_deseq2 "
+            "* deseq2_significant"
+        ),
+        (
+            "# splicing_category_score = "
+            "category_weight_splicing * weighted mean of significant calls "
+            "from MAJIQ, rMATS, LeafCutter and ISA"
+        ),
+        (
+            "# agreement_bonus = "
+            "min(max(n_methods_significant - 1, 0) "
+            "* per_additional_method, maximum)"
+        ),
+        (
+            "# gene_rank_score = "
+            "expression_category_score + splicing_category_score "
+            "+ agreement_bonus"
+        ),
+        (
+            "# rank_order = gene_rank_score desc; "
+            "n_methods_significant desc; "
+            "splicing_category_score desc; "
+            "expression_category_score desc; "
+            "gene_name asc; gene_id asc"
+        ),
+        (
+            "# Ranking parameter values are reported in "
+            f"{prefix}.gene_ranking_parameters.tsv"
+        ),
+    ]
+
+    with path.open(
+        "w",
+        encoding="utf-8",
+    ) as handle:
+        for line in metadata:
+            handle.write(
+                line + "\n"
+            )
+
+        dataframe.to_csv(
+            handle,
+            sep="\t",
+            index=False,
+            na_rep="NA",
+        )
 
 
 def main() -> int:
@@ -1922,18 +1957,16 @@ def main() -> int:
         )
     )
 
-    short_table.to_csv(
+    write_gene_integration_tsv(
+        short_table,
         short_path,
-        sep="\t",
-        index=False,
-        na_rep="NA",
+        args.prefix,
     )
 
-    long_table.to_csv(
+    write_gene_integration_tsv(
+        long_table,
         long_path,
-        sep="\t",
-        index=False,
-        na_rep="NA",
+        args.prefix,
     )
 
     pd.DataFrame(
@@ -1980,6 +2013,7 @@ if __name__ == "__main__":
         raise SystemExit(
             main()
         )
+
     except Exception as error:
         print(
             f"ERROR: {error}",
