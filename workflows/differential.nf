@@ -283,6 +283,29 @@ workflow EASI_DIFFERENTIAL {
         if (params.run_expression.toBoolean()) {
 
         //
+        // MODULE: Count reads per gene with featureCounts
+        //
+        SUBREAD_FEATURECOUNTS(
+            ch_bam_bai.map { meta, bam, bai -> tuple(meta, bam) },
+            ch_gtf
+        )
+
+        //
+        // MODULE: Merge per-sample featureCounts matrices
+        //
+        ch_merge_script = Channel.value(
+            file(
+                "${projectDir}/modules/local/featurecounts_merge/merge_featurecounts.py",
+                checkIfExists: true
+            )
+        )
+
+        FEATURECOUNTS_MERGE(
+            SUBREAD_FEATURECOUNTS.out.counts.collect(),
+            ch_merge_script
+        )
+
+        //
         // MODULE: Differential expression with DESeq2
         // Fan out over all contrasts — one DESeq2 job per contrast
         //
