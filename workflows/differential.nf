@@ -73,26 +73,58 @@ workflow EASI_DIFFERENTIAL {
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        DEFINE CONTRAST
+        DEFINE CONTRAST(S)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
 
-    if (!params.contrast_reference || !params.contrast_target) {
+    if (!params.contrasts && (!params.contrast_reference || !params.contrast_target)) {
         error """
-        A differential comparison requires both:
+        A differential comparison requires either:
 
-          --contrast_reference
-          --contrast_target
+        --contrasts  /path/to/contrasts.csv
 
-        Example:
+        or both:
 
-          --contrast_reference HBR
-          --contrast_target UHR
+        --contrast_reference  <reference_condition>
+        --contrast_target     <target_condition>
+
+        Example (single):
+
+        --contrast_reference WT --contrast_target KO1
+
+        Example (multi):
+
+        contrasts.csv
+            contrast_name,contrast_reference,contrast_target
+            KO1_vs_WT,WT,KO1
+            KO2_vs_WT,WT,KO2
         """.stripIndent()
     }
 
-    def contrast_name = params.contrast_name ?:
-        "${params.contrast_target}_vs_${params.contrast_reference}"
+    def ch_contrasts
+    if (params.contrasts) {
+        ch_contrasts = Channel
+            .fromPath(params.contrasts, checkIfExists: true)
+            .splitCsv(header: true)
+            .map { row ->
+                def name = row.contrast_name ?: "${row.contrast_target}_vs_${row.contrast_reference}"
+                tuple(
+                    [id: name],
+                    row.contrast_reference,
+                    row.contrast_target
+                )
+            }
+    } else {
+        def contrast_name = params.contrast_name ?:
+            "${params.contrast_target}_vs_${params.contrast_reference}"
+        ch_contrasts = Channel.of(
+            tuple(
+                [id: contrast_name],
+                params.contrast_reference,
+                params.contrast_target
+            )
+        )
+    }
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -248,57 +280,23 @@ workflow EASI_DIFFERENTIAL {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
 
-    if (params.run_expression.toBoolean()) {
-
-        //
-        // MODULE: Count reads with featureCounts
-        //
-        ch_bam_for_featurecounts = STAR_ALIGN.out.bam_sorted_aligned
-            .combine(ch_gtf)
-            .map { meta, bam, gtf_meta, gtf ->
-                tuple(
-                    meta,
-                    [bam],
-                    gtf
-                )
-            }
-
-        SUBREAD_FEATURECOUNTS(
-            ch_bam_for_featurecounts
-        )
-
-        ch_multiqc_files = ch_multiqc_files.mix(
-            SUBREAD_FEATURECOUNTS.out.summary.map { _meta, file -> file }
-        )
-
-        //
-        // MODULE: Merge featureCounts outputs
-        //
-        ch_merge_script = Channel.value(
-            file(
-                "${projectDir}/modules/local/featurecounts_merge/bin/merge_featurecounts.py",
-                checkIfExists: true
-            )
-        )
-
-        FEATURECOUNTS_MERGE(
-            SUBREAD_FEATURECOUNTS.out.counts
-                .map { meta, file -> file }
-                .collect(),
-            ch_merge_script
-        )
+        if (params.run_expression.toBoolean()) {
 
         //
         // MODULE: Differential expression with DESeq2
+        // Fan out over all contrasts — one DESeq2 job per contrast
         //
-        ch_deseq2_contrast = Channel.value([
-            [id: contrast_name],
-            params.contrast_variable,
-            params.contrast_reference,
-            params.contrast_target,
-            params.deseq2_formula,
-            params.deseq2_comparison
-        ])
+        ch_deseq2_contrast = ch_contrasts
+            .map { meta, ref, tgt ->
+                tuple(
+                    meta,
+                    params.contrast_variable,
+                    ref,
+                    tgt,
+                    params.deseq2_formula,
+                    params.deseq2_comparison
+                )
+            }
 
         ch_deseq2_input = FEATURECOUNTS_MERGE.out.matrix
             .map { counts ->
@@ -316,7 +314,7 @@ workflow EASI_DIFFERENTIAL {
 
         DESEQ2_DIFFERENTIAL(
             ch_deseq2_contrast,
-            ch_deseq2_input,
+            ch_deseq2_input.first(),   // .first() broadcasts the single matrix to all contrasts
             ch_empty_file,
             ch_empty_file,
             file(
@@ -334,11 +332,15 @@ workflow EASI_DIFFERENTIAL {
 
     if (params.run_splicing.toBoolean()) {
 
-        ch_splicing_contrast = Channel.value([
-            contrast : contrast_name,
-            treatment: params.contrast_target,
-            control  : params.contrast_reference
-        ])
+        // Fan out one splicing job per contrast
+        ch_splicing_contrast = ch_contrasts
+            .map { meta, ref, tgt ->
+                [
+                    contrast : meta.id,
+                    treatment: tgt,
+                    control  : ref
+                ]
+            }
 
         /*
         --------------------------------------------------------------------------------
@@ -435,28 +437,35 @@ workflow EASI_DIFFERENTIAL {
             //
             // MODULE: Construct LeafCutter clustering input
             //
-            ch_leafcutter_cluster_input = REGTOOLS_JUNCTIONSEXTRACT.out.junc
-                .collect(flat: false)
-                .map { collected ->
+            // Build per-contrast LeafCutter input by filtering junctions
+            // to only the two conditions involved in each contrast
+            ch_leafcutter_cluster_input = ch_contrasts
+                .combine(
+                    REGTOOLS_JUNCTIONSEXTRACT.out.junc
+                        .collect(flat: false)
+                )
+                .map { c_meta, ref, tgt, collected ->
 
-                    def junc_files = collected.collect { meta, junc ->
-                        junc
-                    }
+                    def junc_files = collected
+                        .findAll { meta, junc ->
+                            meta.condition == ref || meta.condition == tgt
+                        }
+                        .collect { meta, junc -> junc }
 
-                    def groups = collected.collect { meta, junc ->
-                        [
-                            meta.id,
-                            meta.condition
-                        ]
-                    }
+                    def groups = collected
+                        .findAll { meta, junc ->
+                            meta.condition == ref || meta.condition == tgt
+                        }
+                        .collect { meta, junc ->
+                            [meta.id, meta.condition]
+                        }
 
                     tuple(
-                        [id: contrast_name],
+                        c_meta,
                         junc_files,
                         groups
                     )
                 }
-
             //
             // MODULE: Cluster splice junctions with LeafCutter
             //
@@ -530,11 +539,14 @@ workflow EASI_DIFFERENTIAL {
 
         if (params.run_isa.toBoolean()) {
 
+            ch_isa_contrasts = ch_contrasts
+                .map { meta, ref, tgt -> meta.id }
+
             ISA(
                 TRIMGALORE.out.reads,
                 ch_salmon_lib_type,
                 file(params.input, checkIfExists: true),
-                contrast_name
+                ch_isa_contrasts
             )
         }
 
@@ -615,7 +627,7 @@ workflow EASI_DIFFERENTIAL {
              * modulize output.
              */
             ch_majiq_junctions = MAJIQ.out.deltapsi_tsv_files
-                .map { files ->
+                .map { meta, files ->
 
                     def junction_file = files.find { file ->
                         file.name == 'junctions.tsv'
@@ -624,14 +636,11 @@ workflow EASI_DIFFERENTIAL {
                     if (!junction_file) {
                         error """
                         MAJIQ delta-PSI modulize output does not contain
-                        junctions.tsv for contrast '${contrast_name}'.
+                        junctions.tsv for contrast '${meta.id}'.
                         """.stripIndent()
                     }
 
-                    tuple(
-                        [id: contrast_name],
-                        junction_file
-                    )
+                    tuple(meta, junction_file)
                 }
 
             /*
@@ -651,42 +660,6 @@ workflow EASI_DIFFERENTIAL {
                 ch_splice_region_integration
             )
 
-            /*
-             * Collect the sample metadata, BAM files and BAM indexes into
-             * aligned lists for the contrast-level sashimi process.
-             *
-             * collect(flat: false) is important because each
-             * (meta, bam, bai) tuple must remain intact.
-             */
-            ch_sashimi_samples = ch_bam_bai
-                .collect(
-                    flat: false
-                )
-                .map { rows ->
-
-                    def ordered_rows = rows.sort { left, right ->
-                        left[0].id.toString()
-                            <=> right[0].id.toString()
-                    }
-
-                    def sample_metadata = ordered_rows.collect { row ->
-                        row[0]
-                    }
-
-                    def bam_files = ordered_rows.collect { row ->
-                        row[1]
-                    }
-
-                    def bai_files = ordered_rows.collect { row ->
-                        row[2]
-                    }
-
-                    tuple(
-                        sample_metadata,
-                        bam_files,
-                        bai_files
-                    )
-                }
 
             /*
              * Combine the ranked event table with the complete set of
@@ -699,31 +672,34 @@ workflow EASI_DIFFERENTIAL {
              *   BAM list,
              *   BAI list
              */
-            ch_sashimi_input =
-                SPLICE_REGION_INTEGRATION.out.ranked_splicing_events
-                    .combine(
-                        ch_sashimi_samples
-                    )
-                    .map {
+                        // Attach ref/tgt to each contrast's ranked events
+            ch_sashimi_input = SPLICE_REGION_INTEGRATION.out.ranked_splicing_events
+                .join(
+                    ch_contrasts.map { meta, ref, tgt ->
+                        tuple(meta, ref, tgt)
+                    },
+                    by: 0
+                )
+                .combine(ch_bam_bai.collect(flat: false))
+                .map { meta, ranked_events, ref, tgt, all_bams ->
+
+                    def ordered_rows = all_bams
+                        .findAll { row ->
+                            row[0].condition == ref || row[0].condition == tgt
+                        }
+                        .sort { left, right ->
+                            left[0].id.toString() <=> right[0].id.toString()
+                        }
+
+                    tuple(
                         meta,
                         ranked_events,
-                        sample_metadata,
-                        bam_files,
-                        bai_files ->
+                        ordered_rows.collect { it[0] },  // sample_metadata
+                        ordered_rows.collect { it[1] },  // bam_files
+                        ordered_rows.collect { it[2] }   // bai_files
+                    )
+                }
 
-                        tuple(
-                            meta,
-                            ranked_events,
-                            sample_metadata,
-                            bam_files,
-                            bai_files
-                        )
-                    }
-
-            /*
-             * SASHIMI_PLOT expects the GTF as a plain path rather than
-             * the (meta, path) tuple used by other modules.
-             */
             ch_sashimi_gtf = ch_gtf
                 .map { _gtf_meta, gtf ->
                     gtf

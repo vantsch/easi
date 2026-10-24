@@ -309,6 +309,14 @@
                 "contrast_name": {
                     "type": "string",
                     "description": "Optional comparison name. Defaults to '<target>_vs_<reference>'."
+                },
+                "contrasts": {
+                    "type": "string",
+                    "format": "file-path",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Path to a CSV file defining multiple contrasts to run in a single execution. Columns: contrast_name (optional), contrast_reference, contrast_target. When provided, overrides --contrast_reference and --contrast_target.",
+                    "help_text": "Use this to run all alignments once and perform multiple pairwise comparisons in parallel. Each row defines one contrast. Example: contrast_name,contrast_reference,contrast_target\\nKO1_vs_WT,WT,KO1\\nKO2_vs_WT,WT,KO2",
+                    "fa_icon": "fas fa-table"
                 },          
                 "organism": {
                     "type": "string",
@@ -319,11 +327,7 @@
                         "mouse"
                     ]
                 }
-            },
-            "required": [
-                "contrast_reference",
-                "contrast_target"
-            ]
+            }
         },
         "institutional_config_options": {
             "title": "Institutional config options",
