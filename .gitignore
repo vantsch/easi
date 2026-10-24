@@ -8,3 +8,23 @@ testing*
 *.pyc
 null/
 .lineage/
+# SLURM logs
+*.out
+*.err
+*.slurm
+
+# Backup files
+*.bak
+
+# Work directory
+work/
+
+# Large files
+*.zip
+
+# Nextflow temp files
+.nextflow/
+.nextflow.log*
+
+# MAJIQ output leftovers
+NFCORE_EASI*

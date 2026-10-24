@@ -283,25 +283,40 @@ workflow EASI_DIFFERENTIAL {
         if (params.run_expression.toBoolean()) {
 
         //
-        // MODULE: Count reads per gene with featureCounts
+        // MODULE: Count reads with featureCounts
         //
+        ch_bam_for_featurecounts = STAR_ALIGN.out.bam_sorted_aligned
+            .combine(ch_gtf)
+            .map { meta, bam, gtf_meta, gtf ->
+                tuple(
+                    meta,
+                    [bam],
+                    gtf
+                )
+            }
+
         SUBREAD_FEATURECOUNTS(
-            ch_bam_bai.map { meta, bam, bai -> tuple(meta, bam) },
-            ch_gtf
+            ch_bam_for_featurecounts
+        )
+
+        ch_multiqc_files = ch_multiqc_files.mix(
+            SUBREAD_FEATURECOUNTS.out.summary.map { _meta, file -> file }
         )
 
         //
-        // MODULE: Merge per-sample featureCounts matrices
+        // MODULE: Merge featureCounts outputs
         //
         ch_merge_script = Channel.value(
             file(
-                "${projectDir}/modules/local/featurecounts_merge/merge_featurecounts.py",
+                "${projectDir}/modules/local/featurecounts_merge/bin/merge_featurecounts.py",
                 checkIfExists: true
             )
         )
 
         FEATURECOUNTS_MERGE(
-            SUBREAD_FEATURECOUNTS.out.counts.collect(),
+            SUBREAD_FEATURECOUNTS.out.counts
+                .map { meta, file -> file }
+                .collect(),
             ch_merge_script
         )
 
