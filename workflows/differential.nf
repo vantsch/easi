@@ -481,6 +481,7 @@ workflow EASI_DIFFERENTIAL {
                 .combine(
                     REGTOOLS_JUNCTIONSEXTRACT.out.junc
                         .collect(flat: false)
+                        .map { it -> [it] }
                 )
                 .map { c_meta, ref, tgt, collected ->
 
@@ -578,7 +579,13 @@ workflow EASI_DIFFERENTIAL {
         if (params.run_isa.toBoolean()) {
 
             ch_isa_contrasts = ch_contrasts
-                .map { meta, ref, tgt -> meta.id }
+                .map { meta, ref, tgt ->
+                    [
+                        id: meta.id,
+                        control: ref,
+                        treatment: tgt
+                    ]
+                }
 
             ISA(
                 TRIMGALORE.out.reads,
@@ -612,9 +619,28 @@ workflow EASI_DIFFERENTIAL {
 
             ch_deseq2_results = DESEQ2_DIFFERENTIAL.out.results
             ch_majiq = MAJIQ.out.gene_summary
+            // Restore canonical contrast names for rMATS gene results
             ch_rmats = RMATS.out.gene_summary
+                .map { meta, result_file ->
+                    tuple(meta.id, result_file)
+                }
+                .join(
+                    ch_splicing_contrast.map { c ->
+                        tuple(
+                            "${c.treatment}_vs_${c.control}",
+                            [id: c.contrast]
+                        )
+                    }
+                )
+                .map { old_id, result_file, canonical_meta ->
+                    tuple(canonical_meta, result_file)
+                }
             ch_leaf = LEAFCUTTER_DOWNSTREAM.out.gene_summary
+            // Normalize ISA metadata for integration joins
             ch_isa = ISA.out.gene_summary
+                .map { meta, result_file ->
+                    tuple([id: meta.id], result_file)
+                }
 
 
             ch_gene_level_integration = ch_deseq2_results
@@ -684,9 +710,26 @@ workflow EASI_DIFFERENTIAL {
             /*
              * Join the three detailed result tables by contrast metadata.
              */
+            // Restore canonical IDs for rMATS junction tables
+            ch_rmats_jc_canonical = RMATS.out.jc_annotated
+                .map { meta, result_files ->
+                    tuple(meta.id, result_files)
+                }
+                .join(
+                    ch_splicing_contrast.map { c ->
+                        tuple(
+                            "${c.treatment}_vs_${c.control}",
+                            [id: c.contrast]
+                        )
+                    }
+                )
+                .map { old_id, result_files, canonical_meta ->
+                    tuple(canonical_meta, result_files)
+                }
+
             ch_splice_region_integration = ch_majiq_junctions
                 .join(
-                    RMATS.out.jc_annotated,
+                    ch_rmats_jc_canonical,
                     by: 0
                 )
                 .join(
@@ -718,7 +761,7 @@ workflow EASI_DIFFERENTIAL {
                     },
                     by: 0
                 )
-                .combine(ch_bam_bai.collect(flat: false))
+                .combine(ch_bam_bai.collect(flat: false).map { it -> [it] })
                 .map { meta, ranked_events, ref, tgt, all_bams ->
 
                     def ordered_rows = all_bams

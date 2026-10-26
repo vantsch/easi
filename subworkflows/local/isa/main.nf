@@ -58,35 +58,42 @@ workflow ISA {
 
     ch_isa_part1_input = SALMON_QUANT.out.results
         .collect(flat: false)
-        .map { collected ->
+        .combine(contrast_name)
+        .map { combined ->
 
-            def result_dirs = collected.collect { item ->
-                item[1]
+            def contrast = combined[-1]
+            def collected = combined[0..-2]
+
+            def selected = collected.findAll { item ->
+                item[0].condition in [
+                    contrast.control,
+                    contrast.treatment
+                ]
+            }
+
+            def controls = selected.findAll { item ->
+                item[0].condition == contrast.control
+            }
+
+            def treatments = selected.findAll { item ->
+                item[0].condition == contrast.treatment
+            }
+
+            if (!controls || !treatments) {
+                error "ISA contrast ${contrast.id}: missing samples."
             }
 
             tuple(
-                [id: contrast_name],
-                result_dirs
+                contrast,
+                selected.collect { item -> item[1] }
             )
         }
-
-    ch_isa_contrast_file = Channel
-        .of(
-            "treatment,control\n" +
-            "${params.contrast_target}," +
-            "${params.contrast_reference}\n"
-        )
-        .collectFile(
-            name: "${contrast_name}_isa_contrast.csv",
-            newLine: false
-        )
 
     ISA_PART1(
         ch_isa_part1_input,
         ch_isa_gtf,
         ch_transcript_fasta,
         samplesheet,
-        ch_isa_contrast_file,
         params.isa_alpha,
         params.isa_dif_cutoff
     )

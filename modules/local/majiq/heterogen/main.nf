@@ -13,7 +13,7 @@ process MAJIQ_HETEROGEN {
 
     output:
     path("heterogen/${contrast}.heterogen.tsv"),        emit: heterogen_tsv
-    path("heterogen/${contrast}.hetcov"),               emit: hetcov
+    tuple val(contrast), path("heterogen/${contrast}.hetcov"), emit: hetcov
     path("heterogen/${contrast}.heterogen.logger.txt"), emit: logger
     tuple val("${task.process}"),
           val('majiq'),

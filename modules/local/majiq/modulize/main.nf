@@ -2,12 +2,14 @@ process MAJIQ_MODULIZE {
 
     label 'process_high'
 
+    tag "${meta.id}"
+
     input:
-    tuple path(voila_files), val(meta_splicegraph), path(splicegraph)
+    tuple val(meta), path(voila_files), path(splicegraph)
 
     output:
-    path "${prefix}",       emit: modulize
-    path "${prefix}/*.tsv", emit: tsv_files
+    tuple val(meta), path("${prefix}"),       emit: modulize
+    tuple val(meta), path("${prefix}/*.tsv"), emit: tsv_files
 
     tuple val("${task.process}"),
           val('voila'),

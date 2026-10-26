@@ -354,6 +354,16 @@ if (reference_condition == target_condition) {
     )
 }
 
+# Restrict the full samplesheet to the current comparison.
+design <- design[
+    design$condition %in% c(
+        reference_condition,
+        target_condition
+    ),
+    ,
+    drop = FALSE
+]
+
 available_conditions <- unique(design$condition)
 
 missing_conditions <- setdiff(

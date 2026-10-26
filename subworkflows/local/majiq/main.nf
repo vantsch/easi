@@ -164,63 +164,125 @@ workflow MAJIQ {
     )
 
     /*
-     * Modulize deltapsi results
+     * Contrast-specific VOILA Modulize processing.
+     *
+     * Shared splicegraph and SGC files are reused.
+     * Differential results are joined by contrast ID.
      */
-    ch_majiq_modulize_input_deltapsi = MAJIQ_SGCOVERAGE.out.sgc_files
-        .collect { it[1] }
-        .combine(
-            MAJIQ_DELTAPSI.out.dpsicov.collect()
-        )
-        .toList()
+
+    /*
+     * SGC coverage files are keyed by condition.
+     */
+    ch_majiq_sgc_by_condition = MAJIQ_SGCOVERAGE.out.sgc_files
+        .map { condition, sgc ->
+            tuple(condition, sgc)
+        }
+
+    /*
+     * Associate the shared splicegraph with each contrast.
+     */
+    ch_majiq_graph_by_contrast = ch_contrast
         .combine(ch_majiq_finished_splicegraph)
+        .map { contrast, graph_meta, graph ->
+            tuple(contrast.contrast, graph)
+        }
+
+    /*
+     * Build the VOILA input for each comparison.
+     *
+     * Output:
+     * [meta, [quantification, control_sgc, treatment_sgc],
+     *  splicegraph]
+     */
+    /*
+     * Delta-PSI: join each contrast to its own quantification
+     * result, control SGC, treatment SGC and splicegraph.
+     */
+    ch_majiq_modulize_input_deltapsi =
+        MAJIQ_DELTAPSI.out.dpsicov
+            .join(
+                ch_contrast.map { c ->
+                    tuple(c.contrast, c)
+                }
+            )
+            .map { id, quant_file, c ->
+                tuple(c.control, id, c, quant_file)
+            }
+            .combine(ch_majiq_sgc_by_condition, by: 0)
+            .map { condition, id, c, quant_file, control_sgc ->
+                tuple(
+                    c.treatment,
+                    id,
+                    c,
+                    quant_file,
+                    control_sgc
+                )
+            }
+            .combine(ch_majiq_sgc_by_condition, by: 0)
+            .map { condition, id, c, quant_file,
+                   control_sgc, treatment_sgc ->
+                tuple(
+                    id,
+                    [id: id],
+                    [quant_file, control_sgc, treatment_sgc]
+                )
+            }
+            .join(ch_majiq_graph_by_contrast)
+            .map { id, meta, files, graph ->
+                tuple(meta, files, graph)
+            }
 
     DELTAPSI_MODULIZE(
         ch_majiq_modulize_input_deltapsi
     )
 
     /*
-     * Modulize heterogen results
+     * Heterogen: the same per-contrast channel structure.
      */
-    ch_majiq_modulize_input_heterogen = MAJIQ_SGCOVERAGE.out.sgc_files
-        .collect { it[1] }
-        .combine(
-            MAJIQ_HETEROGEN.out.hetcov.collect()
-        )
-        .toList()
-        .combine(ch_majiq_finished_splicegraph)
+    ch_majiq_modulize_input_heterogen =
+        MAJIQ_HETEROGEN.out.hetcov
+            .join(
+                ch_contrast.map { c ->
+                    tuple(c.contrast, c)
+                }
+            )
+            .map { id, quant_file, c ->
+                tuple(c.control, id, c, quant_file)
+            }
+            .combine(ch_majiq_sgc_by_condition, by: 0)
+            .map { condition, id, c, quant_file, control_sgc ->
+                tuple(
+                    c.treatment,
+                    id,
+                    c,
+                    quant_file,
+                    control_sgc
+                )
+            }
+            .combine(ch_majiq_sgc_by_condition, by: 0)
+            .map { condition, id, c, quant_file,
+                   control_sgc, treatment_sgc ->
+                tuple(
+                    id,
+                    [id: id],
+                    [quant_file, control_sgc, treatment_sgc]
+                )
+            }
+            .join(ch_majiq_graph_by_contrast)
+            .map { id, meta, files, graph ->
+                tuple(meta, files, graph)
+            }
 
     HETEROGEN_MODULIZE(
         ch_majiq_modulize_input_heterogen
     )
 
-     /*
-     * Convert MAJIQ contrast metadata to the standard integration key
-     */
-    ch_majiq_summary_meta = ch_contrast
-        .map { contrast ->
-            [id: contrast.contrast]
-        }
-
     /*
-     * Attach the contrast key to the collection of MAJIQ TSV files.
-     *
-     * combine() produces:
-     * [meta, file1, file2, file3, ...]
-     *
-     * Reconstruct:
-     * [meta, [file1, file2, file3, ...]]
+     * The Modulize output already carries its contrast ID.
+     * No global collection or Cartesian combination is needed.
      */
-    ch_majiq_summarize_input = ch_majiq_summary_meta
-        .combine(DELTAPSI_MODULIZE.out.tsv_files)
-        .map { combined ->
-            def meta      = combined[0]
-            def tsv_files = combined.drop(1)
-
-            tuple(meta, tsv_files)
-        }
-
     MAJIQ_SUMMARIZE(
-        ch_majiq_summarize_input,
+        DELTAPSI_MODULIZE.out.tsv_files,
         file("${projectDir}/modules/local/majiq/downstream/bin/report_events.py")
     )
 

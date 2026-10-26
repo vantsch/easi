@@ -13,7 +13,7 @@ process MAJIQ_DELTAPSI {
 
     output:
     path("deltapsi/${contrast}.deltapsi.tsv"),        emit: deltapsi_tsv
-    path("deltapsi/${contrast}.dpsicov"),             emit: dpsicov
+    tuple val(contrast), path("deltapsi/${contrast}.dpsicov"), emit: dpsicov
     path("deltapsi/${contrast}.deltapsi.logger.txt"), emit: logger
     tuple val("${task.process}"),
           val('majiq'),

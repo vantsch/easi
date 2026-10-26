@@ -12,7 +12,6 @@ process ISA_PART1 {
     path gtf
     path transcript_sequences
     path samplesheet
-    path contrastsheet
     val alpha
     val dIF
 
@@ -49,14 +48,19 @@ process ISA_PART1 {
     def args = task.ext.args ?: ''
 
     """
-    # ISA contrast orientation fix v1
+    # ISA contrast orientation fix v2
     mkdir -p results
+
+    printf 'treatment,control\\n%s,%s\\n' \\
+        '${meta.treatment}' \\
+        '${meta.control}' \\
+        > isa_contrast.csv
 
     Rscript ${moduleDir}/bin/isa_part1.R \
         ${gtf} \
         ${transcript_sequences} \
         ${samplesheet} \
-        ${contrastsheet} \
+        isa_contrast.csv \
         ${alpha} \
         ${dIF} \
         ${args}

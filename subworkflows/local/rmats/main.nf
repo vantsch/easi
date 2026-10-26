@@ -36,11 +36,12 @@ workflow RMATS {
      */
     ch_rmats_groups = ch_bam
         .collect(flat: false)
+        .map { it -> [it] }
         .combine(ch_contrast)
         .map { combined ->
 
             def contrast = combined[-1]
-            def bams     = combined[0..-2]
+            def bams     = combined[0]
 
             /*
             * rMATS calculates:
