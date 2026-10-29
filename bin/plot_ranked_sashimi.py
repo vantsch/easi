@@ -1127,10 +1127,22 @@ def plot_events(
             + flank
         )
 
+        # Limit filename length for events overlapping many genes.
+        # Complete gene annotations remain in the ranked-events TSV.
+        safe_gene_name = sanitise_filename(
+            gene_names,
+            "UNANNOTATED",
+        )[:50]
+
+        safe_chromosome = sanitise_filename(
+            chromosome,
+            "contig",
+        )[:30]
+
         output_stem = (
             f"rank_{rank:03d}_"
-            f"{sanitise_filename(gene_names, 'UNANNOTATED')}_"
-            f"{sanitise_filename(chromosome, 'contig')}_"
+            f"{safe_gene_name}_"
+            f"{safe_chromosome}_"
             f"{event_start}_{event_end}"
         )
 
