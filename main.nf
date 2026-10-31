@@ -44,15 +44,27 @@ workflow NFCORE_EASI {
 
     take:
     samplesheet
+    existing_bams
+    existing_salmon
+    all_samples
 
     main:
 
     def ch_multiqc_report = channel.empty()
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        DIFFERENTIAL MODE
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     if (params.mode == 'differential') {
 
         EASI_DIFFERENTIAL(
             samplesheet,
+            existing_bams,
+            existing_salmon,
+            all_samples,
             params.multiqc_config,
             params.multiqc_logo,
             params.multiqc_methods_description,
@@ -61,9 +73,21 @@ workflow NFCORE_EASI {
 
         ch_multiqc_report = EASI_DIFFERENTIAL.out.multiqc_report
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PROFILING MODE
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     } else if (params.mode == 'profiling') {
 
         error "EASI profiling mode is not implemented yet."
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        TIMECOURSE MODE
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     } else if (params.mode == 'timecourse') {
 
@@ -84,6 +108,7 @@ workflow NFCORE_EASI {
     emit:
     multiqc_report = ch_multiqc_report
 }
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -93,10 +118,11 @@ workflow NFCORE_EASI {
 workflow {
 
     main:
+
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
-    PIPELINE_INITIALISATION (
+    PIPELINE_INITIALISATION(
         params.version,
         params.validate_params,
         params.monochrome_logs,
@@ -111,13 +137,17 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_EASI (
-        PIPELINE_INITIALISATION.out.samplesheet
+    NFCORE_EASI(
+        PIPELINE_INITIALISATION.out.samplesheet,
+        PIPELINE_INITIALISATION.out.existing_bams,
+        PIPELINE_INITIALISATION.out.existing_salmon,
+        PIPELINE_INITIALISATION.out.all_samples
     )
+
     //
     // SUBWORKFLOW: Run completion tasks
     //
-    PIPELINE_COMPLETION (
+    PIPELINE_COMPLETION(
         params.email,
         params.email_on_fail,
         params.plaintext_email,

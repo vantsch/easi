@@ -1,3 +1,4 @@
+
 process REGTOOLS_JUNCTIONSEXTRACT {
     tag "$meta.id"
     label 'process_low'
@@ -8,8 +9,7 @@ process REGTOOLS_JUNCTIONSEXTRACT {
         'community.wave.seqera.io/library/regtools:1.0.0--461ddf16709a70cf' }"
 
     input:
-    tuple val(meta), path(bam), path(bai)
-    val(strand_specificity)
+    tuple val(meta), path(bam), path(bai), val(strand_specificity)
 
     output:
     tuple val(meta), path("*.junc"), emit: junc
@@ -22,6 +22,11 @@ process REGTOOLS_JUNCTIONSEXTRACT {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def strand = strand_specificity ?: 'XS'
+
+    if (!(strand in ['XS', 'RF', 'FR'])) {
+        error "Invalid RegTools strand specificity for ${meta.id}: ${strand}"
+    }
+
     """
     regtools junctions extract \\
         $args \\

@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/easi/master/assets/schema_input.json",
     "title": "nf-core/easi pipeline - params.input schema",
-    "description": "Schema for the file provided with params.input",
+    "description": "Schema for RNA-seq samples. Samples can be supplied as FASTQs or as previously processed BAM and Salmon outputs.",
     "type": "array",
     "items": {
         "type": "object",
@@ -10,36 +10,114 @@
             "sample": {
                 "type": "string",
                 "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "description": "Unique identifier for an individual RNA-seq sample or library.",
+                "errorMessage": "Sample name must be provided and cannot contain whitespace.",
                 "meta": ["id"]
             },
             "condition": {
                 "type": "string",
                 "pattern": "^\\S+$",
-                "errorMessage": "Condition must be provided and cannot contain spaces",
+                "description": "Experimental condition or group to which the sample belongs.",
+                "errorMessage": "Condition must be provided and cannot contain whitespace.",
                 "meta": ["condition"]
             },
             "replicate": {
                 "type": "integer",
                 "minimum": 1,
-                "errorMessage": "Replicate must be a positive integer",
+                "description": "Replicate identifier within the experimental condition.",
+                "errorMessage": "Replicate must be a positive integer.",
                 "meta": ["replicate"]
+            },
+            "donor": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "description": "Optional biological donor or patient identifier.",
+                "errorMessage": "Donor must be a nonempty identifier without whitespace when provided.",
+                "meta": ["donor"]
+            },
+            "batch": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "description": "Optional experimental or sequencing batch identifier.",
+                "errorMessage": "Batch must be a nonempty identifier without whitespace when provided.",
+                "meta": ["batch"]
+            },
+            "strandedness": {
+                "type": "string",
+                "enum": [
+                    "auto",
+                    "forward",
+                    "reverse",
+                    "unstranded"
+                ],
+                "default": "auto",
+                "description": "Library strandedness. Use 'auto' to infer strandedness from the aligned reads, or specify forward, reverse or unstranded.",
+                "errorMessage": "Strandedness must be one of: auto, forward, reverse, unstranded.",
+                "meta": ["strandedness"]
+            },
+            "single_end": {
+                "type": "boolean",
+                "description": "Optional sequencing layout. true = single-end; false = paired-end. Automatically determined when FASTQs are supplied. Required when reusing BAM and Salmon outputs without FASTQs.",
+                "meta": ["single_end"]
             },
             "fastq_1": {
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^([^\\s]+\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "description": "Optional FASTQ read 1. Required when reusable BAM and Salmon outputs are not both supplied.",
+                "errorMessage": "FASTQ read 1 must exist and have the extension '.fq.gz' or '.fastq.gz'."
             },
             "fastq_2": {
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^([^\\s]+\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "description": "Optional FASTQ read 2 for paired-end sequencing.",
+                "errorMessage": "FASTQ read 2 must exist and have the extension '.fq.gz' or '.fastq.gz'."
+            },
+            "bam": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.bam$",
+                "description": "Optional previously aligned, coordinate-sorted BAM file. Must have been generated using a compatible reference genome and alignment settings.",
+                "errorMessage": "BAM file must exist and have the extension '.bam'."
+            },
+            "bai": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.bai$",
+                "description": "BAM index corresponding to the supplied BAM file.",
+                "errorMessage": "BAM index must exist and have the extension '.bai'."
+            },
+            "salmon_quant": {
+                "type": "string",
+                "format": "directory-path",
+                "exists": true,
+                "pattern": "^\\S+$",
+                "description": "Optional directory containing previously generated Salmon quantification outputs, including quant.sf. Must be compatible with the transcriptome reference and quantification settings used by EASI.",
+                "errorMessage": "Salmon quantification directory must exist and cannot contain whitespace."
             }
         },
-        "required": ["sample", "condition", "replicate", "fastq_1"]
+        "required": [
+            "sample",
+            "condition",
+            "replicate"
+        ],
+        "dependentRequired": {
+            "fastq_2": ["fastq_1"],
+            "bam": ["bai"],
+            "bai": ["bam"]
+        },
+        "anyOf": [
+            {
+                "required": ["fastq_1"]
+            },
+            {
+                "required": ["bam", "bai", "salmon_quant"]
+            }
+        ]
     }
 }

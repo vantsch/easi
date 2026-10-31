@@ -4,16 +4,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC as FASTQC_RAW      } from '../modules/nf-core/fastqc/main'
-include { FASTQC as FASTQC_TRIMMED  } from '../modules/nf-core/fastqc/main'
+include { EASI_PREPROCESSING        } from '../subworkflows/local/preprocessing/main'
 include { MULTIQC                   } from '../modules/nf-core/multiqc/main'
-include { TRIMGALORE                } from '../modules/nf-core/trimgalore/main'
-include { STAR_ALIGN                } from '../modules/nf-core/star/align/main'
-include { SAMTOOLS_INDEX            } from '../modules/nf-core/samtools/index/main'
-include { BEDOPS_GTF2BED            } from '../modules/nf-core/bedops/gtf2bed/main'
 include { AGAT_CONVERTSPGXF2GXF     } from '../modules/nf-core/agat/convertspgxf2gxf/main'
-include { RSEQC_INFEREXPERIMENT     } from '../modules/nf-core/rseqc/inferexperiment/main'
-include { RSEQC_STRANDNESS          } from '../modules/local/rseqc/strandness/main'
 include { FEATURECOUNTS_MERGE       } from '../modules/local/featurecounts_merge/main'
 include { SUBREAD_FEATURECOUNTS     } from '../modules/nf-core/subread/featurecounts/main'
 include { DESEQ2_DIFFERENTIAL       } from '../modules/local/deseq2/differential/main'
@@ -30,7 +23,6 @@ include { SASHIMI_PLOT              } from '../modules/local/visualization/sashi
 include { paramsSummaryMap          } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText    } from '../subworkflows/local/utils_nfcore_easi_pipeline'
 
 
 /*
@@ -43,6 +35,9 @@ workflow EASI_DIFFERENTIAL {
 
     take:
     ch_samplesheet
+    ch_existing_bams
+    ch_existing_salmon
+    ch_all_samples
     multiqc_config
     multiqc_logo
     multiqc_methods_description
@@ -102,12 +97,14 @@ workflow EASI_DIFFERENTIAL {
     }
 
     def ch_contrasts
+
     if (params.contrasts) {
         ch_contrasts = Channel
             .fromPath(params.contrasts, checkIfExists: true)
             .splitCsv(header: true)
             .map { row ->
                 def name = row.contrast_name ?: "${row.contrast_target}_vs_${row.contrast_reference}"
+
                 tuple(
                     [id: name],
                     row.contrast_reference,
@@ -117,6 +114,7 @@ workflow EASI_DIFFERENTIAL {
     } else {
         def contrast_name = params.contrast_name ?:
             "${params.contrast_target}_vs_${params.contrast_reference}"
+
         ch_contrasts = Channel.of(
             tuple(
                 [id: contrast_name],
@@ -128,150 +126,48 @@ workflow EASI_DIFFERENTIAL {
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        SHARED PREPROCESSING AND ALIGNMENT
+        SHARED PREPROCESSING
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
 
-    //
-    // MODULE: Run FastQC on raw reads
-    //
-    FASTQC_RAW(ch_samplesheet)
-
-    ch_multiqc_files = ch_multiqc_files.mix(
-        FASTQC_RAW.out.zip.map { _meta, file -> file }
+    EASI_PREPROCESSING(
+        ch_samplesheet,
+        ch_existing_bams,
+        ch_existing_salmon,
+        ch_all_samples
     )
 
-    //
-    // MODULE: Trim reads
-    //
-    TRIMGALORE(ch_samplesheet)
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PREPROCESSING OUTPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
-    ch_multiqc_files = ch_multiqc_files.mix(
-        TRIMGALORE.out.log.map { _meta, file -> file }
-    )
+    ch_bam_bai = EASI_PREPROCESSING.out.bam_bai
 
-    //
-    // MODULE: Run FastQC on trimmed reads
-    //
-    FASTQC_TRIMMED(TRIMGALORE.out.reads)
+    ch_bams = EASI_PREPROCESSING.out.bam
 
-    ch_multiqc_files = ch_multiqc_files.mix(
-        FASTQC_TRIMMED.out.zip.map { _meta, file -> file }
-    )
+    ch_salmon_results = EASI_PREPROCESSING.out.salmon_results
 
-    //
-    // MODULE: Align trimmed reads with STAR
-    //
-    ch_star_index = Channel.value([
-        [:],
-        file(params.star_index, checkIfExists: true)
-    ])
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        REFERENCE ANNOTATION
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     ch_gtf = Channel.value([
         [:],
         file(params.gtf, checkIfExists: true)
     ])
 
-    STAR_ALIGN(
-        TRIMGALORE.out.reads,
-        ch_star_index,
-        ch_gtf,
-        false
-    )
-
-    ch_multiqc_files = ch_multiqc_files.mix(
-        STAR_ALIGN.out.log_final.map { _meta, file -> file }
-    )
-
-    ch_multiqc_files = ch_multiqc_files.mix(
-        STAR_ALIGN.out.log_out.map { _meta, file -> file }
-    )
-
-    ch_multiqc_files = ch_multiqc_files.mix(
-        STAR_ALIGN.out.log_progress.map { _meta, file -> file }
-    )
-
-    //
-    // MODULE: Index STAR BAM files with samtools
-    //
-    SAMTOOLS_INDEX(
-        STAR_ALIGN.out.bam_sorted_aligned
-    )
-
-    ch_bam_bai = STAR_ALIGN.out.bam_sorted_aligned
-        .join(SAMTOOLS_INDEX.out.index)
-        .map { meta, bam, bai ->
-            tuple(meta, bam, bai)
-        }
-
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        SHARED QUALITY CONTROL
+        PREPROCESSING QUALITY CONTROL
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
 
-    //
-    // MODULE: Convert GTF annotation to BED12 for RSeQC
-    //
-    BEDOPS_GTF2BED(ch_gtf)
-
-    ch_bed12 = BEDOPS_GTF2BED.out.bed
-        .map { meta, bed ->
-            bed
-        }
-
-    //
-    // MODULE: Infer RNA-seq library strandedness
-    //
-    RSEQC_INFEREXPERIMENT(
-        ch_bam_bai,
-        ch_bed12
-    )
-
-    RSEQC_STRANDNESS(
-        RSEQC_INFEREXPERIMENT.out.txt
-            .map { meta, report -> report }
-            .collect()
-    )
-
-    ch_regtools_strandness = RSEQC_STRANDNESS.out.strandness
-        .map { strandness ->
-
-            def normalized = strandness.trim()
-
-            def regtools_codes = [
-                'REVERSE'   : 'RF',
-                'FORWARD'   : 'FR',
-                'UNSTRANDED': 'XS'
-            ]
-
-            if (!regtools_codes.containsKey(normalized)) {
-                error "Unsupported inferred strandness: ${normalized}"
-            }
-
-            regtools_codes[normalized]
-        }
-
-    ch_salmon_lib_type = RSEQC_STRANDNESS.out.strandness
-        .map { strandness ->
-
-            def normalized = strandness.trim()
-
-            def salmon_codes = [
-                'REVERSE'   : 'ISR',
-                'FORWARD'   : 'ISF',
-                'UNSTRANDED': 'IU'
-            ]
-
-            if (!salmon_codes.containsKey(normalized)) {
-                error "Unsupported inferred strandness for Salmon: ${normalized}"
-            }
-
-            salmon_codes[normalized]
-        }
-
     ch_multiqc_files = ch_multiqc_files.mix(
-        RSEQC_INFEREXPERIMENT.out.txt.map { meta, file -> file }
+        EASI_PREPROCESSING.out.qc_files
     )
 
     /*
@@ -280,12 +176,15 @@ workflow EASI_DIFFERENTIAL {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
 
-        if (params.run_expression.toBoolean()) {
+    if (params.run_expression.toBoolean()) {
 
-        //
-        // MODULE: Count reads with featureCounts
-        //
-        ch_bam_for_featurecounts = STAR_ALIGN.out.bam_sorted_aligned
+        /*
+        --------------------------------------------------------------------------------
+            featureCounts
+        --------------------------------------------------------------------------------
+        */
+
+        ch_bam_for_featurecounts = ch_bams
             .combine(ch_gtf)
             .map { meta, bam, gtf_meta, gtf ->
                 tuple(
@@ -300,12 +199,16 @@ workflow EASI_DIFFERENTIAL {
         )
 
         ch_multiqc_files = ch_multiqc_files.mix(
-            SUBREAD_FEATURECOUNTS.out.summary.map { _meta, file -> file }
+            SUBREAD_FEATURECOUNTS.out.summary
+                .map { _meta, file -> file }
         )
 
-        //
-        // MODULE: Merge featureCounts outputs
-        //
+        /*
+        --------------------------------------------------------------------------------
+            Merge featureCounts outputs
+        --------------------------------------------------------------------------------
+        */
+
         ch_merge_script = Channel.value(
             file(
                 "${projectDir}/modules/local/featurecounts_merge/bin/merge_featurecounts.py",
@@ -320,10 +223,12 @@ workflow EASI_DIFFERENTIAL {
             ch_merge_script
         )
 
-        //
-        // MODULE: Differential expression with DESeq2
-        // Fan out over all contrasts — one DESeq2 job per contrast
-        //
+        /*
+        --------------------------------------------------------------------------------
+            DESeq2
+        --------------------------------------------------------------------------------
+        */
+
         ch_deseq2_contrast = ch_contrasts
             .map { meta, ref, tgt ->
                 tuple(
@@ -352,7 +257,7 @@ workflow EASI_DIFFERENTIAL {
 
         DESEQ2_DIFFERENTIAL(
             ch_deseq2_contrast,
-            ch_deseq2_input.first(),   // .first() broadcasts the single matrix to all contrasts
+            ch_deseq2_input.first(),
             ch_empty_file,
             ch_empty_file,
             file(
@@ -370,7 +275,12 @@ workflow EASI_DIFFERENTIAL {
 
     if (params.run_splicing.toBoolean()) {
 
-        // Fan out one splicing job per contrast
+        /*
+        --------------------------------------------------------------------------------
+            Define splicing contrasts
+        --------------------------------------------------------------------------------
+        */
+
         ch_splicing_contrast = ch_contrasts
             .map { meta, ref, tgt ->
                 [
@@ -388,19 +298,23 @@ workflow EASI_DIFFERENTIAL {
 
         if (params.run_majiq.toBoolean()) {
 
-            //
-            // MODULE: Convert GTF annotation to GFF3
-            //
-            AGAT_CONVERTSPGXF2GXF(ch_gtf)
+            /*
+             * Convert GTF annotation to GFF3
+             */
+
+            AGAT_CONVERTSPGXF2GXF(
+                ch_gtf
+            )
 
             ch_gff3 = AGAT_CONVERTSPGXF2GXF.out.output_gff
 
-            //
-            // SUBWORKFLOW: Alternative splicing analysis with MAJIQ
-            //
+            /*
+             * Alternative splicing analysis with MAJIQ
+             */
+
             MAJIQ(
                 ch_gff3,
-                STAR_ALIGN.out.bam_sorted_aligned,
+                ch_bams,
                 ch_splicing_contrast
             )
         }
@@ -411,38 +325,17 @@ workflow EASI_DIFFERENTIAL {
         --------------------------------------------------------------------------------
         */
 
-        ch_rmats_strandness = RSEQC_STRANDNESS.out.strandness
-            .map { strandness ->
+        /*
+         * BAM metadata already contains the resolved
+         * strandedness for each sample.
+         *
+         * This includes both newly generated and reused BAMs.
+         */
 
-                def normalized = strandness.trim().toUpperCase()
-
-                def rmats_strandness = [
-                    'REVERSE'   : 'reverse',
-                    'FORWARD'   : 'forward',
-                    'UNSTRANDED': 'unstranded'
-                ]
-
-                if (!rmats_strandness.containsKey(normalized)) {
-                    error "Unsupported inferred strandness for rMATS: ${normalized}"
-                }
-
-                rmats_strandness[normalized]
-            }
-
-        ch_rmats_bam = STAR_ALIGN.out.bam_sorted_aligned
-            .combine(ch_rmats_strandness)
-            .map { meta, bam, strandedness ->
-                tuple(
-                    meta + [strandedness: strandedness],
-                    bam
-                )
-            }
+        ch_rmats_bam = ch_bams
 
         if (params.run_rmats.toBoolean()) {
 
-            //
-            // SUBWORKFLOW: Alternative splicing analysis with rMATS
-            //
             RMATS(
                 ch_rmats_bam,
                 ch_gtf,
@@ -464,19 +357,44 @@ workflow EASI_DIFFERENTIAL {
 
         if (params.run_leafcutter.toBoolean()) {
 
-            //
-            // MODULE: Extract splice junctions with RegTools
-            //
+            /*
+             * Associate each BAM with its own RegTools
+             * strand specificity using the unique sample ID.
+             */
+
+            ch_regtools_input = ch_bam_bai
+                .map { meta, bam, bai ->
+                    tuple(meta.id, meta, bam, bai)
+                }
+                .join(
+                    EASI_PREPROCESSING.out.regtools_strandness
+                        .map { meta, strand ->
+                            tuple(meta.id, strand)
+                        },
+                    failOnMismatch: true,
+                    failOnDuplicate: true
+                )
+                .map { sample_id, meta, bam, bai, strand ->
+                    tuple(meta, bam, bai, strand)
+                }
+
+            /*
+             * Extract splice junctions with RegTools
+             */
+
             REGTOOLS_JUNCTIONSEXTRACT(
-                ch_bam_bai,
-                ch_regtools_strandness
+                ch_regtools_input
             )
 
-            //
-            // MODULE: Construct LeafCutter clustering input
-            //
-            // Build per-contrast LeafCutter input by filtering junctions
-            // to only the two conditions involved in each contrast
+            /*
+            * Build LeafCutter input with deterministic sample ordering.
+            *
+            * Target samples are listed first, followed by reference samples.
+            * Within each group, samples are sorted by their unique IDs.
+            *
+            * This ensures reproducible group orientation and input ordering.
+            */
+
             ch_leafcutter_cluster_input = ch_contrasts
                 .combine(
                     REGTOOLS_JUNCTIONSEXTRACT.out.junc
@@ -485,19 +403,37 @@ workflow EASI_DIFFERENTIAL {
                 )
                 .map { c_meta, ref, tgt, collected ->
 
-                    def junc_files = collected
+                    // Select samples belonging to this contrast.
+                    def selected = collected
                         .findAll { meta, junc ->
                             meta.condition == ref || meta.condition == tgt
                         }
-                        .collect { meta, junc -> junc }
 
-                    def groups = collected
-                        .findAll { meta, junc ->
-                            meta.condition == ref || meta.condition == tgt
+                    // Deterministic ordering:
+                    // 1. Target group
+                    // 2. Reference group
+                    // 3. Sample ID within each group
+                    def ordered = selected.sort { a, b ->
+
+                        def rank_a = a[0].condition == tgt ? 0 : 1
+                        def rank_b = b[0].condition == tgt ? 0 : 1
+
+                        def group_comparison = rank_a <=> rank_b
+
+                        if (group_comparison != 0) {
+                            return group_comparison
                         }
-                        .collect { meta, junc ->
-                            [meta.id, meta.condition]
-                        }
+
+                        return a[0].id.toString() <=> b[0].id.toString()
+                    }
+
+                    def junc_files = ordered.collect { meta, junc ->
+                        junc
+                    }
+
+                    def groups = ordered.collect { meta, junc ->
+                        [meta.id, meta.condition]
+                    }
 
                     tuple(
                         c_meta,
@@ -505,18 +441,23 @@ workflow EASI_DIFFERENTIAL {
                         groups
                     )
                 }
-            //
-            // MODULE: Cluster splice junctions with LeafCutter
-            //
+
+            /*
+             * Cluster splice junctions
+             */
+
             LEAFCUTTER_CLUSTER(
                 ch_leafcutter_cluster_input
             )
 
-            //
-            // MODULE: LeafCutter differential-splicing analysis
-            //
+            /*
+             * LeafCutter differential-splicing analysis
+             */
+
             ch_leafcutter_ds_input = LEAFCUTTER_CLUSTER.out.numerators
-                .join(LEAFCUTTER_CLUSTER.out.groups_file)
+                .join(
+                    LEAFCUTTER_CLUSTER.out.groups_file
+                )
                 .map { meta, counts, groups ->
                     tuple(
                         meta,
@@ -529,9 +470,10 @@ workflow EASI_DIFFERENTIAL {
                 ch_leafcutter_ds_input
             )
 
-            //
-            // MODULE: Annotate and summarise LeafCutter results
-            //
+            /*
+             * Annotate and summarise LeafCutter results
+             */
+
             ch_leafcutter_downstream = LEAFCUTTER_DS.out.cluster_significance
                 .join(
                     LEAFCUTTER_DS.out.effect_sizes,
@@ -588,8 +530,7 @@ workflow EASI_DIFFERENTIAL {
                 }
 
             ISA(
-                TRIMGALORE.out.reads,
-                ch_salmon_lib_type,
+                ch_salmon_results,
                 file(params.input, checkIfExists: true),
                 ch_isa_contrasts
             )
@@ -610,7 +551,6 @@ workflow EASI_DIFFERENTIAL {
             params.run_isa.toBoolean()
         ) {
 
-
             /*
             --------------------------------------------------------------------------------
                 Combine DESeq2 results and standardized splicing gene summaries
@@ -618,8 +558,13 @@ workflow EASI_DIFFERENTIAL {
             */
 
             ch_deseq2_results = DESEQ2_DIFFERENTIAL.out.results
+
             ch_majiq = MAJIQ.out.gene_summary
-            // Restore canonical contrast names for rMATS gene results
+
+            /*
+             * Restore canonical contrast names for rMATS gene results.
+             */
+
             ch_rmats = RMATS.out.gene_summary
                 .map { meta, result_file ->
                     tuple(meta.id, result_file)
@@ -635,13 +580,21 @@ workflow EASI_DIFFERENTIAL {
                 .map { old_id, result_file, canonical_meta ->
                     tuple(canonical_meta, result_file)
                 }
+
             ch_leaf = LEAFCUTTER_DOWNSTREAM.out.gene_summary
-            // Normalize ISA metadata for integration joins
+
+            /*
+             * Normalize ISA metadata for integration joins.
+             */
+
             ch_isa = ISA.out.gene_summary
                 .map { meta, result_file ->
                     tuple([id: meta.id], result_file)
                 }
 
+            /*
+             * Join expression and splicing gene summaries.
+             */
 
             ch_gene_level_integration = ch_deseq2_results
                 .join(
@@ -690,6 +643,7 @@ workflow EASI_DIFFERENTIAL {
              * Extract the MAJIQ junction table from the delta-PSI
              * modulize output.
              */
+
             ch_majiq_junctions = MAJIQ.out.deltapsi_tsv_files
                 .map { meta, files ->
 
@@ -710,7 +664,11 @@ workflow EASI_DIFFERENTIAL {
             /*
              * Join the three detailed result tables by contrast metadata.
              */
-            // Restore canonical IDs for rMATS junction tables
+
+            /*
+             * Restore canonical IDs for rMATS junction tables.
+             */
+
             ch_rmats_jc_canonical = RMATS.out.jc_annotated
                 .map { meta, result_files ->
                     tuple(meta.id, result_files)
@@ -741,10 +699,8 @@ workflow EASI_DIFFERENTIAL {
                 ch_splice_region_integration
             )
 
-
             /*
-             * Combine the ranked event table with the complete set of
-             * sample BAMs and indexes.
+             * Combine ranked events with all sample BAMs and indexes.
              *
              * Result:
              *   meta,
@@ -753,7 +709,7 @@ workflow EASI_DIFFERENTIAL {
              *   BAM list,
              *   BAI list
              */
-                        // Attach ref/tgt to each contrast's ranked events
+
             ch_sashimi_input = SPLICE_REGION_INTEGRATION.out.ranked_splicing_events
                 .join(
                     ch_contrasts.map { meta, ref, tgt ->
@@ -761,7 +717,11 @@ workflow EASI_DIFFERENTIAL {
                     },
                     by: 0
                 )
-                .combine(ch_bam_bai.collect(flat: false).map { it -> [it] })
+                .combine(
+                    ch_bam_bai
+                        .collect(flat: false)
+                        .map { it -> [it] }
+                )
                 .map { meta, ranked_events, ref, tgt, all_bams ->
 
                     def ordered_rows = all_bams
@@ -775,9 +735,9 @@ workflow EASI_DIFFERENTIAL {
                     tuple(
                         meta,
                         ranked_events,
-                        ordered_rows.collect { it[0] },  // sample_metadata
-                        ordered_rows.collect { it[1] },  // bam_files
-                        ordered_rows.collect { it[2] }   // bai_files
+                        ordered_rows.collect { it[0] },
+                        ordered_rows.collect { it[1] },
+                        ordered_rows.collect { it[2] }
                     )
                 }
 
@@ -792,7 +752,6 @@ workflow EASI_DIFFERENTIAL {
             )
         }
     }
-           
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -864,7 +823,7 @@ workflow EASI_DIFFERENTIAL {
             )
 
     def ch_methods_description = channel.value(
-        methodsDescriptionText(ch_multiqc_custom_methods_description)
+        ch_multiqc_custom_methods_description.text
     )
 
     ch_multiqc_files = ch_multiqc_files.mix(
@@ -896,6 +855,12 @@ workflow EASI_DIFFERENTIAL {
                 ]
             }
     )
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        OUTPUT CHANNELS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     emit:
 

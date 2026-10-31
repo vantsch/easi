@@ -26,36 +26,30 @@ include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipelin
 workflow PIPELINE_INITIALISATION {
 
     take:
-    version           // boolean: Display version and exit
-    validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs   // boolean: Do not use coloured log outputs
-    nextflow_cli_args //   array: List of positional nextflow CLI args
-    outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
-    help              // boolean: Display help message and exit
-    help_full         // boolean: Show the full help message
-    show_hidden       // boolean: Show hidden parameters in the help message
+    version
+    validate_params
+    monochrome_logs
+    nextflow_cli_args
+    outdir
+    input
+    help
+    help_full
+    show_hidden
 
     main:
 
     ch_versions = channel.empty()
 
-    //
-    // Print version and exit if required and dump pipeline parameters to JSON file
-    //
-    UTILS_NEXTFLOW_PIPELINE (
+    UTILS_NEXTFLOW_PIPELINE(
         version,
         true,
         outdir,
         workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1
     )
 
-    //
-    // Validate parameters and generate parameter summary to stdout
-    //
-
     def before_text = ""
     def after_text = ""
+
     before_text = """
 -\033[2m----------------------------------------------------\033[0m-
                                         \033[0;32m,--.\033[0;30m/\033[0;32m,-.\033[0m
@@ -66,20 +60,22 @@ workflow PIPELINE_INITIALISATION {
 \033[0;35m  nf-core/easi ${workflow.manifest.version}\033[0m
 -\033[2m----------------------------------------------------\033[0m-
 """
-    after_text = """${workflow.manifest.doi ? "\n* The pipeline\n" : ""}${workflow.manifest.doi.tokenize(",").collect { doi -> "    https://doi.org/${doi.trim().replace('https://doi.org/','')}"}.join("\n")}${workflow.manifest.doi ? "\n" : ""}
+
+    after_text = """${workflow.manifest.doi ? "\n* The pipeline\n" : ""}${workflow.manifest.doi.tokenize(",").collect { doi -> "    https://doi.org/${doi.trim().replace('https://doi.org/','')}" }.join("\n")}${workflow.manifest.doi ? "\n" : ""}
 * The nf-core framework
     https://doi.org/10.1038/s41587-020-0439-x
 
 * Software dependencies
     https://github.com/nf-core/easi/blob/master/CITATIONS.md
 """
+
     if (monochrome_logs) {
         before_text = before_text.replaceAll(/\033\[[0-9;]*m/, '')
     }
 
     command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>"
 
-    UTILS_NFSCHEMA_PLUGIN (
+    UTILS_NFSCHEMA_PLUGIN(
         workflow,
         validate_params,
         null,
@@ -91,45 +87,226 @@ workflow PIPELINE_INITIALISATION {
         command
     )
 
-    //
-    // Check config provided to the pipeline
-    //
-    UTILS_NFCORE_PIPELINE (
+    UTILS_NFCORE_PIPELINE(
         nextflow_cli_args
     )
 
-    //
-    // Custom validation for pipeline parameters
-    //
     validateInputParameters()
 
-    //
-    // Create channel from input file provided through params.input
-    //
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PARSE FASTQ AND REUSABLE INPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        The field order follows assets/schema_input.json.
+
+        Fields marked as metadata are combined into meta.
+
+        Expected output:
+
+        meta, fastq_1, fastq_2, bam, bai, salmon_quant
+
+        Metadata includes:
+            id
+            condition
+            replicate
+            donor (optional)
+            batch (optional)
+            strandedness (optional, defaults to auto)
+
+        All rows are grouped by sample ID.
+
+        FASTQ samples retain the original format:
+            tuple(meta, reads)
+
+        Reusable inputs:
+            tuple(meta, bam, bai)
+            tuple(meta, salmon_quant_directory)
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     channel
-        .fromList(samplesheetToList(input, "${projectDir}/assets/schema_input.json"))
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
+        .fromList(
+            samplesheetToList(
+                input,
+                "${projectDir}/assets/schema_input.json"
+            )
+        )
+        .map { meta, fastq_1, fastq_2, bam, bai, salmon_quant ->
+
+            /*
+                Identify available FASTQ files.
+            */
+
+            def has_fastq_1 = hasSamplesheetValue(fastq_1)
+            def has_fastq_2 = hasSamplesheetValue(fastq_2)
+
+            def reads = []
+
+            if (has_fastq_1) {
+
+                reads.add(fastq_1)
+
+                if (has_fastq_2) {
+                    reads.add(fastq_2)
                 }
+            }
+
+            /*
+                Preserve sample metadata.
+
+                Add a default strandedness value when the
+                optional samplesheet column is absent.
+            */
+
+            def sample_meta = new LinkedHashMap(meta)
+
+            sample_meta.strandedness = (
+                meta.strandedness ?: 'auto'
+            ).toString().trim().toLowerCase()
+
+            /*
+                Determine single-end/paired-end status
+                when FASTQs are available.
+            */
+
+            /*
+            Sequencing layout.
+
+            When FASTQs are available, determine the layout
+            directly from the presence of read 2.
+
+            When FASTQs are absent, use the declared
+            single_end metadata.
+            */
+
+            if (has_fastq_1) {
+
+                def inferred_single_end = !has_fastq_2
+
+                if (hasSamplesheetValue(meta.single_end) &&
+                    meta.single_end != inferred_single_end) {
+                    error(
+                        "Sample ${meta.id}: declared single_end=${meta.single_end} " +
+                        "disagrees with the supplied FASTQ files."
+                    )
+                }
+
+                sample_meta.single_end = inferred_single_end
+
+            } else {
+
+                if (!(meta.single_end instanceof Boolean)) {
+                    error(
+                        "Sample ${meta.id}: single_end must be true or false " +
+                        "when FASTQ files are not provided."
+                    )
+                }
+
+                sample_meta.single_end = meta.single_end
+            }
+
+            /*
+                Construct sample record.
+            */
+
+            def sample_record = [
+                meta        : sample_meta,
+                reads       : reads,
+                bam         : hasSamplesheetValue(bam) ? bam : null,
+                bai         : hasSamplesheetValue(bai) ? bai : null,
+                salmon_quant: hasSamplesheetValue(salmon_quant) ? salmon_quant : null
+            ]
+
+            return tuple(
+                meta.id,
+                sample_record
+            )
         }
         .groupTuple()
-        .map { samplesheet ->
-            validateInputSamplesheet(samplesheet)
+        .map { sample_id, records ->
+            validateInputSamplesheet(sample_id, records)
         }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
+        .set { ch_all_samples }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        FASTQ PREPROCESSING INPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        Preprocess reads when either:
+
+        - No reusable BAM is available
+        - No reusable Salmon quantification is available
+
+        Fully processed samples do not enter this channel.
+
+        Output format:
+            tuple(meta, reads)
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    ch_samplesheet = ch_all_samples
+        .filter { sample ->
+            sample.bam == null || sample.salmon_quant == null
         }
-        .set { ch_samplesheet }
+        .map { sample ->
+            tuple(
+                sample.meta,
+                sample.reads
+            )
+        }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PREVIOUSLY ALIGNED BAM INPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    ch_existing_bams = ch_all_samples
+        .filter { sample ->
+            sample.bam != null
+        }
+        .map { sample ->
+            tuple(
+                sample.meta,
+                sample.bam,
+                sample.bai
+            )
+        }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PREVIOUS SALMON QUANTIFICATIONS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    ch_existing_salmon = ch_all_samples
+        .filter { sample ->
+            sample.salmon_quant != null
+        }
+        .map { sample ->
+            tuple(
+                sample.meta,
+                sample.salmon_quant
+            )
+        }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        OUTPUT CHANNELS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     emit:
-    samplesheet = ch_samplesheet
-    versions    = ch_versions
+
+    samplesheet     = ch_samplesheet
+    existing_bams   = ch_existing_bams
+    existing_salmon = ch_existing_salmon
+    all_samples     = ch_all_samples
+    versions        = ch_versions
 }
 
 /*
@@ -141,22 +318,26 @@ workflow PIPELINE_INITIALISATION {
 workflow PIPELINE_COMPLETION {
 
     take:
-    email           //  string: email address
-    email_on_fail   //  string: email address sent on pipeline failure
-    plaintext_email // boolean: Send plain-text email instead of HTML
-    outdir          //    path: Path to output directory where results will be published
-    monochrome_logs // boolean: Disable ANSI colour codes in log output
-    multiqc_report  //  string: Path to MultiQC report
+    email
+    email_on_fail
+    plaintext_email
+    outdir
+    monochrome_logs
+    multiqc_report
 
     main:
-    summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
+
+    summary_params = paramsSummaryMap(
+        workflow,
+        parameters_schema: "nextflow_schema.json"
+    )
+
     def multiqc_reports = multiqc_report.toList()
 
-    //
-    // Completion email and summary
-    //
     workflow.onComplete {
+
         if (email || email_on_fail) {
+
             completionEmail(
                 summary_params,
                 email,
@@ -169,10 +350,10 @@ workflow PIPELINE_COMPLETION {
         }
 
         completionSummary(monochrome_logs)
-
     }
 
     workflow.onError {
+
         log.error "Pipeline failed. Please refer to troubleshooting docs for common issues: https://nf-co.re/docs/running/troubleshooting"
     }
 }
@@ -182,114 +363,314 @@ workflow PIPELINE_COMPLETION {
     FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-//
-// Check and validate pipeline parameters
-//
+
 def validateInputParameters() {
     genomeExistsError()
 }
 
-//
-// Validate channels from input samplesheet
-//
-def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CHECK WHETHER AN OPTIONAL SAMPLESHEET VALUE EXISTS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+    nf-schema represents missing optional file columns
+    as empty lists.
+
+    Treat null, empty collections and empty strings
+    as absent.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+def hasSamplesheetValue(value) {
+
+    if (value == null) {
+        return false
     }
 
-    return [ metas[0], fastqs ]
+    if (value instanceof Collection) {
+        return !value.isEmpty()
+    }
+
+    return !value.toString().trim().isEmpty()
 }
-//
-// Get attribute from genome config file e.g. fasta
-//
-def getGenomeAttribute(attribute) {
-    if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-        if (params.genomes[ params.genome ].containsKey(attribute)) {
-            return params.genomes[ params.genome ][ attribute ]
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    VALIDATE AND COMBINE SAMPLE RECORDS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Supports:
+      - One FASTQ pair per sample
+      - Multiple sequencing lanes per sample
+      - Existing BAM/BAI files
+      - Existing Salmon quantifications
+      - Optional donor and batch metadata
+      - Optional per-sample strandedness
+
+    Multiple FASTQ rows are supported.
+
+    For now, reusable BAM/Salmon inputs must occupy
+    one row per sample.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+def validateInputSamplesheet(sample_id, records) {
+
+    /*
+        Check that sample records exist.
+    */
+
+    if (!records || records.isEmpty()) {
+        error "Sample ${sample_id}: no input records found."
+    }
+
+    def first = records[0]
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        VALIDATE STRANDEDNESS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def allowed_strandedness = [
+        'auto',
+        'forward',
+        'reverse',
+        'unstranded'
+    ]
+
+    records.each { record ->
+
+        def strandedness = record.meta.strandedness
+
+        if (!(strandedness in allowed_strandedness)) {
+
+            error(
+                "Sample ${sample_id}: invalid strandedness '${strandedness}'. " +
+                "Allowed values: ${allowed_strandedness.join(', ')}"
+            )
         }
     }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        VALIDATE METADATA CONSISTENCY
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        Metadata must agree between sequencing lanes
+        belonging to the same sample.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def metadata_fields = [
+        'id',
+        'condition',
+        'replicate',
+        'donor',
+        'batch',
+        'strandedness',
+        'single_end'
+    ]
+
+    records.each { record ->
+
+        metadata_fields.each { field ->
+
+            def expected = first.meta[field]
+            def observed = record.meta[field]
+
+            if (expected != observed) {
+
+                error(
+                    "Sample ${sample_id}: inconsistent '${field}' " +
+                    "across samplesheet rows."
+                )
+            }
+        }
+    }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        VALIDATE REUSABLE INPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def has_reusable_inputs = records.any { record ->
+
+        record.bam != null ||
+        record.bai != null ||
+        record.salmon_quant != null
+    }
+
+    if (records.size() > 1 && has_reusable_inputs) {
+
+        error(
+            "Sample ${sample_id}: reusable BAM/Salmon inputs " +
+            "must be provided in a single samplesheet row."
+        )
+    }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        VALIDATE SINGLE-END / PAIRED-END CONSISTENCY
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def combined_reads = []
+
+    def endedness = records
+        .findAll { record ->
+            !record.reads.isEmpty()
+        }
+        .collect { record ->
+            record.meta.single_end
+        }
+        .unique()
+
+    if (endedness.size() > 1) {
+
+        error(
+            "Sample ${sample_id}: multiple FASTQ runs must " +
+            "all be single-end or all be paired-end."
+        )
+    }
+
+    /*
+        Combine FASTQ files from multiple sequencing lanes.
+    */
+
+    records.each { record ->
+        combined_reads.addAll(record.reads)
+    }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        VALIDATE BAM AND SALMON INPUT COMBINATIONS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def bam = first.bam
+    def bai = first.bai
+    def salmon_quant = first.salmon_quant
+
+    if ((bam == null) != (bai == null)) {
+
+        error(
+            "Sample ${sample_id}: BAM and BAI must be " +
+            "provided together."
+        )
+    }
+
+    if (combined_reads.isEmpty() &&
+        (bam == null || salmon_quant == null)) {
+
+        error(
+            "Sample ${sample_id}: provide FASTQs or both " +
+            "reusable BAM/BAI and Salmon quantification."
+        )
+    }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        FINAL SAMPLE METADATA
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    def combined_meta = new LinkedHashMap(first.meta)
+
+    if (!endedness.isEmpty()) {
+        combined_meta.single_end = endedness[0]
+    }
+
+    /*
+        Ensure strandedness is present in the final metadata.
+    */
+
+    combined_meta.strandedness = (
+        combined_meta.strandedness ?: 'auto'
+    ).toString().trim().toLowerCase()
+
+    /*
+        Return the combined sample record.
+    */
+
+    return [
+        meta        : combined_meta,
+        reads       : combined_reads,
+        bam         : bam,
+        bai         : bai,
+        salmon_quant: salmon_quant
+    ]
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    GET ATTRIBUTE FROM GENOME CONFIGURATION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+def getGenomeAttribute(attribute) {
+
+    if (params.genomes &&
+        params.genome &&
+        params.genomes.containsKey(params.genome)) {
+
+        if (params.genomes[params.genome].containsKey(attribute)) {
+
+            return params.genomes[params.genome][attribute]
+        }
+    }
+
     return null
 }
 
-//
-// Exit pipeline if incorrect --genome key provided
-//
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    VALIDATE GENOME SELECTION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 def genomeExistsError() {
-    if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
-        def error_string = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
+
+    if (params.genomes &&
+        params.genome &&
+        !params.genomes.containsKey(params.genome)) {
+
+        def error_string =
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
             "  Genome '${params.genome}' not found in any config files provided to the pipeline.\n" +
             "  Currently, the available genome keys are:\n" +
-            "  ${params.genomes.keySet().join(", ")}\n" +
+            "  ${params.genomes.keySet().join(', ')}\n" +
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
         error(error_string)
     }
 }
-//
-// Generate methods description for MultiQC
-//
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    MULTIQC METHODS INFORMATION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 def toolCitationText() {
-    // TODO nf-core: Optionally add in-text citation tools to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
+
     def citation_text = [
-            "Tools used in the workflow included:",
-            "FastQC (Andrews 2010),",
-            "MultiQC (Ewels et al. 2016)",
-            "."
-        ].join(' ').trim()
+        "Tools used in the workflow included:",
+        "FastQC (Andrews 2010),",
+        "MultiQC (Ewels et al. 2016)",
+        "."
+    ].join(' ').trim()
 
     return citation_text
 }
 
 def toolBibliographyText() {
-    // TODO nf-core: Optionally add bibliographic entries to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
+
     def reference_text = [
-            "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
-            "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
-        ].join(' ').trim()
+        "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
+        "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results from multiple tools. Bioinformatics, 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
+    ].join(' ').trim()
 
     return reference_text
-}
-
-def methodsDescriptionText(mqc_methods_yaml) {
-    // Convert  to a named map so can be used as with familiar NXF ${workflow} variable syntax in the MultiQC YML file
-    def meta = [:]
-    meta.workflow = workflow.toMap()
-    meta["manifest_map"] = workflow.manifest.toMap()
-
-    // Pipeline DOI
-    if (meta.manifest_map.doi) {
-        // Using a loop to handle multiple DOIs
-        // Removing `https://doi.org/` to handle pipelines using DOIs vs DOI resolvers
-        // Removing ` ` since the manifest.doi is a string and not a proper list
-        def temp_doi_ref = ""
-        def manifest_doi = meta.manifest_map.doi.tokenize(",")
-        manifest_doi.each { doi_ref ->
-            temp_doi_ref += "(doi: <a href=\'https://doi.org/${doi_ref.replace("https://doi.org/", "").replace(" ", "")}\'>${doi_ref.replace("https://doi.org/", "").replace(" ", "")}</a>), "
-        }
-        meta["doi_text"] = temp_doi_ref.substring(0, temp_doi_ref.length() - 2)
-    } else meta["doi_text"] = ""
-    meta["nodoi_text"] = meta.manifest_map.doi ? "" : "<li>If available, make sure to update the text to include the Zenodo DOI of version of the pipeline used. </li>"
-
-    // Tool references
-    meta["tool_citations"] = ""
-    meta["tool_bibliography"] = ""
-
-    // TODO nf-core: Only uncomment below if logic in toolCitationText/toolBibliographyText has been filled!
-    // meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
-    // meta["tool_bibliography"] = toolBibliographyText()
-
-
-    def methods_text = mqc_methods_yaml.text
-
-    def engine =  new groovy.text.SimpleTemplateEngine()
-    def description_html = engine.createTemplate(methods_text).make(meta)
-
-    return description_html.toString()
 }

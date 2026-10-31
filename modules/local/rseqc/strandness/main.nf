@@ -1,20 +1,20 @@
 process RSEQC_STRANDNESS {
 
-    tag 'strandness'
+    tag "${meta.id}"
     label 'process_single'
 
     container 'community.wave.seqera.io/library/pip_openpyxl_pandas:6a8c6a3118605483'
 
     input:
-    path reports
+    tuple val(meta), path(report)
 
     output:
-    stdout emit: strandness
+    tuple val(meta), stdout, emit: strandness
 
     script:
     """
     python ${moduleDir}/bin/parse_rseqc_strandness.py \
-        ${reports.join(' ')}
+        ${report}
     """
 
     stub:

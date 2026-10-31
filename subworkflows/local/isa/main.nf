@@ -1,11 +1,10 @@
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT MODULES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SALMON_INDEX          } from '../../../modules/nf-core/salmon/index/main'
-include { SALMON_QUANT          } from '../../../modules/nf-core/salmon/quant/main'
 include { ISA_PART1             } from '../../../modules/local/isa/part1/main'
 include { PFAM_SCAN             } from '../../../modules/local/pfam/scan/main'
 include { PFAM_FORMAT_ISA       } from '../../../modules/local/pfam/format_isa/main'
@@ -20,16 +19,17 @@ include { ISA_PART2             } from '../../../modules/local/isa/part2/main'
 workflow ISA {
 
     take:
-    reads
-    salmon_lib_type
+    salmon_results
     samplesheet
     contrast_name
 
     main:
 
-    ch_genome_fasta = Channel.value(
-        file(params.fasta, checkIfExists: true)
-    )
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        REFERENCE INPUTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     ch_transcript_fasta = Channel.value(
         file(params.transcript_fasta, checkIfExists: true)
@@ -42,21 +42,25 @@ workflow ISA {
         )
     )
 
-    SALMON_INDEX(
-        ch_genome_fasta,
-        ch_transcript_fasta
-    )
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PREPARE SALMON RESULTS FOR EACH CONTRAST
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    SALMON_QUANT(
-        reads,
-        SALMON_INDEX.out.index,
-        ch_isa_gtf,
-        ch_transcript_fasta,
-        false,
-        salmon_lib_type
-    )
+        Salmon quantification is performed by EASI_PREPROCESSING.
 
-    ch_isa_part1_input = SALMON_QUANT.out.results
+        This workflow accepts:
+          - Newly generated Salmon results
+          - Previously generated Salmon results
+
+        Expected channel structure:
+            tuple(meta, salmon_quantification_directory)
+
+        Results are filtered separately for each contrast.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    ch_isa_part1_input = salmon_results
         .collect(flat: false)
         .combine(contrast_name)
         .map { combined ->
@@ -89,6 +93,12 @@ workflow ISA {
             )
         }
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ISA PART 1
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     ISA_PART1(
         ch_isa_part1_input,
         ch_isa_gtf,
@@ -98,6 +108,12 @@ workflow ISA {
         params.isa_dif_cutoff
     )
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PFAM REQUIREMENTS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     if (!params.pfam_hmm) {
         error "ISA requires --pfam_hmm"
     }
@@ -105,6 +121,12 @@ workflow ISA {
     if (!params.pfam_clans) {
         error "ISA requires --pfam_clans"
     }
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PFAM DATABASE
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     def pfam_hmm = file(
         params.pfam_hmm,
@@ -121,6 +143,12 @@ workflow ISA {
         )
     )
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        PFAM SCAN
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     PFAM_SCAN(
         ISA_PART1.out.aa_fasta,
         ch_pfam_db
@@ -135,6 +163,12 @@ workflow ISA {
         ch_pfam_clans
     )
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ISA PART 2
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     ch_isa_part2_input = ISA_PART1.out.switchlist
         .join(
             PFAM_FORMAT_ISA.out.pfam_isa,
@@ -146,8 +180,15 @@ workflow ISA {
         ch_isa_gtf
     )
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        OUTPUT CHANNELS
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
     emit:
-    salmon_results             = SALMON_QUANT.out.results
+
+    salmon_results             = salmon_results
     switchlist_part1           = ISA_PART1.out.switchlist
     isa_part1_switches         = ISA_PART1.out.switches
     isa_part1_isoform_features = ISA_PART1.out.isoform_features
@@ -164,5 +205,5 @@ workflow ISA {
     isa_part2_isoform_features = ISA_PART2.out.isoform_features
     switch_plots               = ISA_PART2.out.switch_plots
     consequence_summary        = ISA_PART2.out.consequence_summary
-    gene_summary           = ISA_PART2.out.gene_summary
+    gene_summary               = ISA_PART2.out.gene_summary
 }
